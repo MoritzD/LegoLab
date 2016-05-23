@@ -1,0 +1,84 @@
+#include <vector>
+#include "opencv2/opencv.hpp"
+#include "opencv2/highgui.hpp"
+
+
+using namespace cv;
+
+int main()
+{
+    VideoCapture cap(1);
+
+    if(!cap.isOpened()){
+        std::cout << "Could not open video stream!\n";
+        return -1;
+    }
+    Mat frame, image;
+    //Mat mask = (Mat_<char>(3,3) <<  0, -1, 0, -1, 5, -1, 0, -1, 0);
+    Mat mask = (Mat_<char>(3,3) << -1,0,1,-2,0,2,-1,0,1);
+
+    std::cout << "Mask = "<< std::endl << mask << std::endl;
+
+    namedWindow("Original", CV_WINDOW_AUTOSIZE);
+    namedWindow("Window", CV_WINDOW_AUTOSIZE);
+
+    while(1){
+        cap >> frame; //get frame
+        cvtColor(frame, image, CV_RGB2GRAY, 1); //reduce color to one channel
+        filter2D(image, image, frame.depth(), mask); //aply maks
+
+        //calc max and min points for each row
+        std::vector<Point2i> max_points(image.rows-2);
+        std::vector<Point2i> min_points(image.rows-2);
+        char max_value = 0;
+        char min_value = CHAR_MAX;
+        char current_value = 0;
+        int x_min = 0;
+        int x_max = 0;
+        for(int j = 1; j<image.rows-1; j++){ //edges not interpolated
+            max_value = 0;
+            min_value = CHAR_MAX;
+            x_min = 0;
+            x_max = 0;
+            for(int i = 1; i < image.cols-1; i++){
+                current_value = image.ptr<uchar>(j)[i];
+                if(max_value < current_value){
+                    max_value = current_value;
+                    x_max = i;
+                }
+                if(min_value > current_value){
+                    min_value = current_value;
+                    x_min = i;
+                }
+            }
+            max_points[j-1] = cvPoint(x_max, j-1);
+            min_points[j-1] = cvPoint(x_min, j-1);
+        }
+
+        //calculate lines
+        Vec4f max_line;
+        Vec4f min_line;
+        fitLine(max_points, max_line, CV_DIST_L2, 0, 0.01, 0.01);
+        fitLine(min_points, min_line, CV_DIST_L2, 0, 0.01, 0.01);
+        cvtColor(image, image, CV_GRAY2RGB, 3); //three channels are needed to draw colored lines
+
+        //draw min- and max-lines on the image
+        Point2i max_point1 = cvPoint(max_line[2]+ 200*max_line[0], max_line[3] + 200*max_line[1]);
+        Point2i max_point2 = cvPoint(max_line[2]- 200*max_line[0], max_line[3] - 200*max_line[1]);
+        Point2i min_point1 = cvPoint(min_line[2]+ 200*min_line[0], min_line[3] + 200*min_line[1]);
+        Point2i min_point2 = cvPoint(min_line[2]- 200*min_line[0], min_line[3] - 200*min_line[1]);
+        line(image, max_point1, max_point2, CV_RGB(255,0,0), 1,8,0);
+        line(image, min_point1, min_point2, CV_RGB(0,255,0), 1,8,0);
+
+        imshow("Original", frame);
+        imshow("Window", image);
+
+        waitKey(10); //delay; necessary for winows to be updated
+
+    }
+
+    return 0;
+}
+
+
+
