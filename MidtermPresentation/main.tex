@@ -1,0 +1,124 @@
+%\documentclass[10pt, handout]{beamer}
+\documentclass[10pt]{beamer}
+% use the first one to ignore /pause and the second one to make use of it!
+\usetheme[
+%%% option passed to the outer theme
+%    progressstyle=fixedCircCnt,   % fixedCircCnt, movingCircCnt (moving is deault)
+  ]{Feather}
+  
+% If you want to change the colors of the various elements in the theme, edit and uncomment the following lines
+
+% Change the bar colors:
+%\setbeamercolor{Feather}{fg=red!100,bg=red!0}
+
+% Change the color of the structural elements:
+\setbeamercolor{structure}{fg=white}
+
+% Change the frame title text color:
+\setbeamercolor{frametitle}{fg=white}
+
+% Change the normal text color background:
+\setbeamercolor{normal text}{fg=white, bg= }%gray!90}
+
+\definecolor{light-gray}{gray}{0.7}
+
+%-------------------------------------------------------
+% INCLUDE PACKAGES
+%-------------------------------------------------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\usepackage{array}
+
+\usepackage{pdfpages}
+
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{tkz-graph}
+%\usetikzlibrary{calc}
+%\usetikzlibarary{calc}
+
+%-------------------------------------------------------
+% DEFFINING AND REDEFINING COMMANDS
+%-------------------------------------------------------
+
+% colored hyperlinks
+\newcommand{\chref}[2]{
+  \href{#1}{{\usebeamercolor[bg]{Feather}#2}}
+}
+
+%-------------------------------------------------------
+% INFORMATION IN THE TITLE PAGE
+%-------------------------------------------------------
+
+\title[Lego Car] % [] is optional - is placed on the bottom of the sidebar on every slide
+{ % is placed on the title page
+      \textbf{Lego Car}
+}
+
+\subtitle[Midterm Presentation]
+{
+      \textbf{Midterm Presentation}
+}
+
+\author[Autor]
+{      
+	Berkay, Moritz Dötterl, Abdallah, Heiko TODO: Nachnamen eintragen
+}
+
+%\institute[]
+%{
+%       "Estar no estado de graça concede ao homem o céu no futuro; saber que está no estado de graça concede o céu agora e no futuro". - Thomas Brooks (Livro "Céu na Terra" de 1654)
+  
+  %there must be an empty line above this line - otherwise some unwanted space is added between the university and the country (I do not know why;( )
+%}
+
+\date{30.5.2016}
+
+
+%-------------------------------------------------------
+% THE BODY OF THE PRESENTATION
+%-------------------------------------------------------
+
+
+
+\begin{document}
+
+%-------------------------------------------------------
+% THE TITLEPAGE
+%-------------------------------------------------------
+
+{\1% % this is the name of the PDF file for the background
+\begin{frame}[plain,noframenumbering] % the plain option removes the header from the title page, noframenumbering removes the numbering of this frame only
+  \titlepage % call the title page information from above
+\end{frame}
+
+{
+\addtobeamertemplate{navigation symbols}{}{%
+    \usebeamerfont{footline}%
+    \usebeamercolor[fg]{title}%
+    \hspace{5em}%
+   \normalsize\insertframenumber/\inserttotalframenumber
+}
+\begin{frame}[plain]{\huge Agenda}
+	\begin{itemize}
+	\LARGE
+		\item Nano Board
+		\item Wiring
+		\item Raspberry Pi
+		\item OpenCV
+	\end{itemize}
+
+\end{frame}
+
+
+\input{berkay.tex}
+\input{moritz.tex}
+\input{abdallah.tex}
+\input{heiko.tex}
+}
+}
+
+\end{document}
