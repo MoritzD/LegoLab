@@ -25,7 +25,7 @@ int main()
     while(1){
         cap >> frame; //get frame
         GaussianBlur(frame, image, Size2i(5,5),0,0, BORDER_DEFAULT); //apply gaussian filter
-        filter2D(frame, image, frame.depth(), mask); //aply maks
+        filter2D(image, image, frame.depth(), mask); //aply maks
         cvtColor(image, image, CV_RGB2GRAY, 1); //reduce color to one channel
 
         //calc max and min points for each row
