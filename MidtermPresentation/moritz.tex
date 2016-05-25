@@ -1,15 +1,45 @@
  
-\begin{frame}[plain]{FrameTitle}{optional subtitle}
-	% this is a comment
-	This is Text on the slide
+\begin{frame}[plain]{Wiring}{overview}
+	Components:
+	\center
+	\pause
 	\begin{itemize}
-		\item This is a 
-		\item itemize
+		\item Sensors
+		\begin{itemize}
+			\item Ultrasonic
+			\item Camera
+		\end{itemize}
+		\pause
+		\item Actuators
+		\begin{itemize}
+			\item Steering Servo
+			\item Drive Motor
+		\end{itemize}
+		\pause
+		\item Controll
+		\begin{itemize}
+			\item Nanoboard
+			\item Raspberry Pi
+		\end{itemize}
+		\pause
+		\item Power supply
+		\begin{itemize}
+			\item Battery
+			\item H-Bridge
+		\end{itemize}
 	\end{itemize}
-	\begin{enumerate}
-		\item Same thing with numbers
-	\end{enumerate}
-	\vspace{2cm}
-	this text has 2cm Distance from above (because of vspace)\\ % \\ means new line
-	Moritz
+	
 \end{frame}
+ 
+ 
+ 
+ \newcounter{ctra}
+\setcounter{ctra}{1}
+\whiledo {\value{ctra} < 13}%
+{%
+\begin{frame}[plain,noframenumbering]{Wiring}
+	\includegraphics[width=\textwidth]{Feathergraphics/wiring\the\value{ctra}}
+\addtocounter{page}{-1}
+\end{frame}
+ \stepcounter {ctra}%
+}
