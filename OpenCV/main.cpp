@@ -24,8 +24,9 @@ int main()
 
     while(1){
         cap >> frame; //get frame
-        cvtColor(frame, image, CV_RGB2GRAY, 1); //reduce color to one channel
-        filter2D(image, image, frame.depth(), mask); //aply maks
+        GaussianBlur(frame, image, Size2i(5,5),0,0, BORDER_DEFAULT); //apply gaussian filter
+        filter2D(frame, image, frame.depth(), mask); //aply maks
+        cvtColor(image, image, CV_RGB2GRAY, 1); //reduce color to one channel
 
         //calc max and min points for each row
         std::vector<Point2i> max_points(image.rows-2);
@@ -63,17 +64,25 @@ int main()
         cvtColor(image, image, CV_GRAY2RGB, 3); //three channels are needed to draw colored lines
 
         //draw min- and max-lines on the image
-        Point2i max_point1 = cvPoint(max_line[2]+ 200*max_line[0], max_line[3] + 200*max_line[1]);
-        Point2i max_point2 = cvPoint(max_line[2]- 200*max_line[0], max_line[3] - 200*max_line[1]);
+        Point2i max_point1 = cvPoint(max_line[2]- 200*std::abs(max_line[0]), max_line[3] - 200*std::abs(max_line[1]));
+        Point2i max_point2 = cvPoint(max_line[2]+ 200*std::abs(max_line[0]), max_line[3] + 200*std::abs(max_line[1]));
         Point2i min_point1 = cvPoint(min_line[2]+ 200*min_line[0], min_line[3] + 200*min_line[1]);
         Point2i min_point2 = cvPoint(min_line[2]- 200*min_line[0], min_line[3] - 200*min_line[1]);
-        line(image, max_point1, max_point2, CV_RGB(255,0,0), 1,8,0);
-        line(image, min_point1, min_point2, CV_RGB(0,255,0), 1,8,0);
+        Point2i car_position = cvPoint(image.rows/2, image.cols);
+        line(image, max_point1, max_point2, CV_RGB(255,0,0), 1,8,0); //max line (red)
+        line(image, min_point1, min_point2, CV_RGB(0,255,0), 1,8,0); //min line (yellow)
+        line(image, car_position, max_point1, CV_RGB(0,0,255), 2, 8, 0); //direction of car (blue)
 
         imshow("Original", frame);
         imshow("Window", image);
 
         waitKey(10); //delay; necessary for winows to be updated
+
+        Vec2f car_direction(max_point1.x-car_position.x, max_point1.y-car_position.y);
+        normalize(car_direction, car_direction, 1, NORM_L1);
+        float direction = std::copysignf(std::acos(std::abs(car_direction[1])), car_direction[0]);
+        direction = direction * 180 / M_PI;
+        std::cout << "The calculated direction is: " << direction << '\n';
 
     }
 
