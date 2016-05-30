@@ -1,15 +1,70 @@
  
-\begin{frame}[plain]{FrameTitle}{optional subtitle}
+\begin{frame}[plain]{Line Detection}
 	% this is a comment
-	This is Text on the slide
+	Approach
 	\begin{itemize}
-		\item This is a 
-		\item itemize
+		\item Approximate line
+		\item Calculate direction
 	\end{itemize}
-	\begin{enumerate}
-		\item Same thing with numbers
-	\end{enumerate}
-	\vspace{2cm}
-	this text has 2cm Distance from above (because of vspace)\\ % \\ means new line
-	Heiko
+	\pause
+	Assumptions
+	\begin{itemize}
+		\item Vertical line
+		\item Car position
+		\item Line is highest contrast on image
+		\item Width of line (optional)
+	\end{itemize}
+\end{frame}	
+
+\begin{frame}[plain]{Line Detection}
+	\begin{columns}[T]
+		\begin{column}[T]{5cm}
+			\vspace{5mm}
+			Steps
+			\begin{itemize}				
+				\visible<1->{\item Get Frame from camera}
+				\visible<2->{\item Apply Gaussian Filter}
+				\visible<3->{\item Transform image from RGB to grey}
+				\visible<4->{
+				\item Approximate Gradient
+					$
+					M=
+					\begin{bmatrix}
+					-1 & 0 & 1 \\
+					-2 & 0 & 2 \\
+					-1 & 0 & 1
+					\end{bmatrix}
+					$			
+				}
+				\visible<5->{\item Calculate maximal points for each row}
+				\visible<6->{\item Fit line on points}
+				\visible<7->{\item Calculate direction of car}
+			\end{itemize}
+		\end{column}
+		\begin{column}[T]{7cm}
+			\vspace{1cm}
+			\includegraphics<1>[width=\textwidth]{Heikographics/line1}
+			\includegraphics<2>[width=\textwidth]{Heikographics/line2}
+			\includegraphics<3>[width=\textwidth]{Heikographics/line3}
+			\includegraphics<4>[width=\textwidth]{Heikographics/line4}
+			\includegraphics<5>[width=\textwidth]{Heikographics/line5}
+			\includegraphics<6>[width=\textwidth]{Heikographics/line6}
+			\includegraphics<7>[width=\textwidth]{Heikographics/line7}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+
+\begin{frame}[plain]{Line Detection}
+	Pros/Cons
+	\begin{itemize}
+		\item Fast calculation time
+		\item Vulnerable to noise
+	\end{itemize}
+	TODO
+	\begin{itemize}
+		\item Calculate discrete angle
+		\item Attaching camera
+		\item Testing/Optimization
+	\end{itemize}
 \end{frame}
