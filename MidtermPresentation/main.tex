@@ -35,6 +35,7 @@
 \usepackage{pdfpages}
 
 \usepackage{listings}
+%\usepackage{fancyhdr}
 %\usepackage{tikz}
 %\usepackage{tkz-graph}
 %\usetikzlibrary{calc}
@@ -48,6 +49,8 @@
 \newcommand{\chref}[2]{
   \href{#1}{{\usebeamercolor[bg]{Feather}#2}}
 }
+
+
 
 %-------------------------------------------------------
 % INFORMATION IN THE TITLE PAGE
@@ -65,7 +68,7 @@
 
 \author[Autor]
 {      
-	Berkay, Moritz Dötterl, Abdallah, Heiko Lengenfelder TODO: Nachnamen eintragen
+	Moritz Dötterl, Berkay Sümer, Abdallah Emad, Heiko Lengenfelder
 }
 
 %\institute[]
@@ -97,11 +100,13 @@
 
 {
 \addtobeamertemplate{navigation symbols}{}{%
+%\addtobeamertemplate{footline}{%
     \usebeamerfont{footline}%
     \usebeamercolor[fg]{title}%
-    \hspace{5em}%
-   \small\insertframenumber/\inserttotalframenumber
+   \small\insertframenumber%/\inserttotalframenumber
+   \hspace{6,28cm}%
 }
+
 \begin{frame}[plain]{\huge Agenda}
 	\begin{itemize}
 	\LARGE
@@ -115,10 +120,25 @@
 
 
 \input{moritz.tex}
-\input{berkay.tex}
+}}
+{
+\addtobeamertemplate{navigation symbols}{}{%
+%\addtobeamertemplate{footline}{%
+    \usebeamerfont{footline}%
+    \usebeamercolor[fg]{title}%
+   \small\insertframenumber%/\inserttotalframenumber
+   \hspace{6,28cm}%
+}
+
+%\includepdf[pages=-, pagecommand={\thispagestyle{plain}}]{berkay.pdf}
+\includepdf[pages=-,pagecommand={\setcounter{framenumber}{\value{page}}\thispagestyle{plain}}]{berkay.pdf}
+
+
+{\1
 \input{abdallah.tex}
 \input{heiko.tex}
 }
 }
+
 
 \end{document}

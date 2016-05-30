@@ -32,14 +32,19 @@
 \end{frame}
  
  
- 
+ \begin{frame}[plain]{Wiring}{circuit layout}
+	\includegraphics[width=\textwidth]{Feathergraphics/wiring1}
+	\end{frame}
+	
+	
  \newcounter{ctra}
-\setcounter{ctra}{1}
+\setcounter{ctra}{2}
 \whiledo {\value{ctra} < 13}%
 {%
-\begin{frame}[plain,noframenumbering]{Wiring}
+\begin{frame}[plain,noframenumbering]{Wiring}{circuit layout}
 	\includegraphics[width=\textwidth]{Feathergraphics/wiring\the\value{ctra}}
-\addtocounter{page}{-1}
+
 \end{frame}
  \stepcounter {ctra}%
 }
+\addtocounter{page}{-16}
