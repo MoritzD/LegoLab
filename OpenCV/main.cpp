@@ -11,6 +11,8 @@ float calcDirection(Mat, VideoCapture);
 const Mat LINE_DETECTION_MASK = (Mat_<char>(3,3) << -1,0,1,-2,0,2,-1,0,1);
 
 int main(){
+    //calcDirectionWindowed();
+
     VideoCapture cap(1);
     if(!cap.isOpened()){
         std::cout << "Could not open video stream!\n";
@@ -83,11 +85,18 @@ void calcDirectionWindowed()
         Vec4f min_line;
         fitLine(max_points, max_line, CV_DIST_L2, 0, 0.01, 0.01);
         fitLine(min_points, min_line, CV_DIST_L2, 0, 0.01, 0.01);
+
         cvtColor(image, image, CV_GRAY2RGB, 3); //three channels are needed to draw colored lines
 
         //draw min- and max-lines on the image
-        Point2i max_point1 = cvPoint(max_line[2]- 200*std::abs(max_line[0]), max_line[3] - 200*std::abs(max_line[1]));
-        Point2i max_point2 = cvPoint(max_line[2]+ 200*std::abs(max_line[0]), max_line[3] + 200*std::abs(max_line[1]));
+        Point2i max_point1 = cvPoint(max_line[2]- 200*max_line[0], max_line[3] - 200*max_line[1]);
+        Point2i max_point2 = cvPoint(max_line[2]+ 200*max_line[0], max_line[3] + 200*max_line[1]);
+        if(max_point1.y>max_point2.y){
+            Point2i buff = max_point2;
+            max_point2 = max_point1;
+            max_point1 = buff;
+        }
+
         Point2i min_point1 = cvPoint(min_line[2]+ 200*min_line[0], min_line[3] + 200*min_line[1]);
         Point2i min_point2 = cvPoint(min_line[2]- 200*min_line[0], min_line[3] - 200*min_line[1]);
         Point2i car_position = cvPoint(image.rows/2, image.cols);
@@ -141,7 +150,13 @@ float calcDirection(Mat buff, VideoCapture cap){
     fitLine(max_points, max_line, CV_DIST_L2, 0, 0.01, 0.01);
 
     //Point the car should drive to
-    Point2i max_point = cvPoint(max_line[2]- 200*std::abs(max_line[0]), max_line[3] - 200*std::abs(max_line[1]));
+    Point2i max_point = cvPoint(max_line[2] - 200*max_line[0], max_line[3] - 200*max_line[1]);
+
+    //make sure max_point is the further away one (line output does some weird shit)
+    Point2i max_pointb = cvPoint(max_line[2] + 200*max_line[0], max_line[3] + 200*max_line[1]);
+    if(max_point.y>max_pointb.y) max_point = max_pointb;
+
+    //estimated position of car (TODO)
     Point2i car_position = cvPoint(buff.rows/2, buff.cols);
 
     //Calculate driving direction
@@ -149,6 +164,12 @@ float calcDirection(Mat buff, VideoCapture cap){
     normalize(car_direction, car_direction, 1, NORM_L1);
     float direction = std::copysignf(std::acos(std::abs(car_direction[1])), car_direction[0]);
     direction = direction * 180 / M_PI;
+
+    /* Just for debugging
+    namedWindow("Debug", WINDOW_AUTOSIZE);
+    imshow("Debug", buff);
+    waitKey(10);
+    */
 
     return direction;
 }
