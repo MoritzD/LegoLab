@@ -21,7 +21,7 @@ typedef unsigned long long ulong_64;
 #include <stdio.h>
 #include "system.h"
 #include "motor_setting.h"
-#include "stearing_setting.h"
+#include "steering_setting.h"
 #include "pin_tests.h"
 #include "ultrasound.h"
 

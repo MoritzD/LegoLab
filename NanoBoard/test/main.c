@@ -17,7 +17,7 @@ int main()
 
 	//Assign steering pins
 	unsigned long s_phase1=0x0,s_phase2=0x000,s_duty1=0x0,s_duty2=0x0,s_period=0x186A,s_enable=0x3;
-	stearing_setting(s_phase1,s_duty1,s_phase2,s_duty2,s_period,s_enable);
+	steering_setting(s_phase1,s_duty1,s_phase2,s_duty2,s_period,s_enable);
 
 
 	//Intit Ultrasound
@@ -70,7 +70,7 @@ int main()
 		}
 
 		//Set PWM-Signals
-		stearing_setting(s_phase1,s_duty1,s_phase2,s_duty2,s_period,s_enable);
+		steering_setting(s_phase1,s_duty1,s_phase2,s_duty2,s_period,s_enable);
 		motor_setting(m_phase1, m_duty1, m_phase2, m_duty2, m_period, m_enable);
 
 		float duty1pr = ((float) s_duty1) / 6251.0;
