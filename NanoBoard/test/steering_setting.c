@@ -25,41 +25,42 @@ void steering_setting(unsigned long phase1, unsigned long duty1,unsigned long ph
 	* pwm_duty2=duty2;
 }
 
-//possible levels are from -7 to 7
+//possible levels are from 0 to 14
+//straight is 7
 void steering_set_level(char level){
 	unsigned long period = 0x186A;
 	unsigned long phase1 = 0;
 	unsigned long phase2 = 0;
 	switch(level){
-	case -7:phase1 = 0x186A;
+	case 0:	phase1 = 0x186A;
 			phase2 = 0; break;
-	case -6:phase1 = 5357;
+	case 1:	phase1 = 5357;
 			phase2 = 0; break;
-	case -5:phase1 = 4464;
+	case 2:	phase1 = 4464;
 			phase2 = 0; break;
-	case -4:phase1 = 3571;
+	case 3:	phase1 = 3571;
 			phase2 = 0; break;
-	case -3:phase1 = 2679;
+	case 4:	phase1 = 2679;
 			phase2 = 0; break;
-	case -2:phase1 = 1786;
+	case 5:	phase1 = 1786;
 			phase2 = 0; break;
-	case -1:phase1 = 893;
+	case 6: phase1 = 893;
 			phase2 = 0; break;
-	case 0: phase1 = 0;
+	case 7: phase1 = 0;
 			phase2 = 0; break;
-	case 7: phase2 = 0x186A;
+	case 8: phase2 = 0x186A;
 			phase1 = 0; break;
-	case 6: phase2 = 5357;
+	case 9: phase2 = 5357;
 			phase1 = 0; break;
-	case 5: phase2 = 4464;
+	case 10:phase2 = 4464;
 			phase1 = 0; break;
-	case 4: phase2 = 3571;
+	case 11:phase2 = 3571;
 			phase1 = 0; break;
-	case 3: phase2 = 2679;
+	case 12:phase2 = 2679;
 			phase1 = 0; break;
-	case 2: phase2 = 1786;
+	case 13:phase2 = 1786;
 			phase1 = 0; break;
-	case 1: phase2 = 893;
+	case 14:phase2 = 893;
 			phase1 = 0; break;
 	default:phase1 = 0;
 			phase2 = 0;

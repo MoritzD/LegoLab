@@ -27,6 +27,10 @@ int main()
 	ultrasound_init(NEW_ULTRASOUND2_BASE);
 	printf("Ultrasound initialized!\n");
 
+	//Init Raspberry uart
+	raspberry_init(UART_0_BASE);
+
+
 	//Print sensor values
 	/*while(1){
 		distance0 = ultrasound_read(NEW_ULTRASOUND0_BASE) * 170;

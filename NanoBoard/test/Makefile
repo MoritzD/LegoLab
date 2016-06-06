@@ -149,6 +149,7 @@ C_SRCS += pin_tests.c
 C_SRCS += uart.c
 C_SRCS += ultrasound.c
 C_SRCS += steering_setting.c
+C_SRCS += raspberry_uart.c
 CXX_SRCS :=
 ASM_SRCS :=
 
