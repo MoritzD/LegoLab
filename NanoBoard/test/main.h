@@ -26,6 +26,10 @@ typedef unsigned long long ulong_64;
 #include "ultrasound.h"
 #include "raspberry_uart.h"
 
+int main();
+void drive_by_sensors();
+void drive_by_rasp_input();
+
 
 
 #endif /* MAIN_H_ */
