@@ -145,10 +145,11 @@ ELF := test.elf
 C_SRCS += hello_world.c
 C_SRCS += main.c
 C_SRCS += motor_setting.c
-C_SRCS += stearing_setting.c
 C_SRCS += pin_tests.c
 C_SRCS += uart.c
 C_SRCS += ultrasound.c
+C_SRCS += steering_setting.c
+C_SRCS += raspberry_uart.c
 CXX_SRCS :=
 ASM_SRCS :=
 

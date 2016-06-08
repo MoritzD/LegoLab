@@ -17,12 +17,12 @@ void test_stearing(unsigned int test_type, unsigned long s_period){
 		unsigned int i = 0;
 		while(1){
 			while(s_duty1<s_period){
-				stearing_setting(0, s_duty1, 0, 0, s_period, 1);
+				steering_setting(0, s_duty1, 0, 0, s_period, 1);
 				s_duty1 += 10;
 				for(i=0;i<2550;i++); //delay
 			}
 			while(s_duty1>0){
-				stearing_setting(0, s_duty1, 0, 0, s_period, 1);
+				steering_setting(0, s_duty1, 0, 0, s_period, 1);
 				s_duty1 -= 10;
 				for(i=0;i<2550;i++); //delay
 			}
@@ -32,12 +32,12 @@ void test_stearing(unsigned int test_type, unsigned long s_period){
 		unsigned int i = 0;
 		while(1){
 			while(s_duty2<s_period){
-				stearing_setting(0, 0, 0, s_duty2, s_period, 2);
+				steering_setting(0, 0, 0, s_duty2, s_period, 2);
 				s_duty2 += 10;
 				for(i=0;i<2550;i++); //delay
 			}
 			while(s_duty2>0){
-				stearing_setting(0, 0, 0, s_duty2, s_period, 2);
+				steering_setting(0, 0, 0, s_duty2, s_period, 2);
 				s_duty2 -= 10;
 				for(i=0;i<2550;i++); //delay
 			}

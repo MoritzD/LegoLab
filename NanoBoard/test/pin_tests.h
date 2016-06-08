@@ -9,7 +9,7 @@
 #define PIN_TESTS_H_
 
 #include "motor_setting.h"
-#include "stearing_setting.h"
+#include "steering_setting.h"
 
 void test_stearing(unsigned int test_type, unsigned long s_period);
 void test_motor(unsigned int test_type, unsigned long m_period);
