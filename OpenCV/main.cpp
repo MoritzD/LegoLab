@@ -1,17 +1,17 @@
-#include <vector>
-#include "opencv2/opencv.hpp"
-#include "opencv2/highgui.hpp"
+#include "main.hpp"
 
 
 using namespace cv;
 
-void calcDirectionWindowed();
-float calcDirection(Mat, VideoCapture);
 
 const Mat LINE_DETECTION_MASK = (Mat_<char>(3,3) << -1,0,1,-2,0,2,-1,0,1);
 
 int main(){
     //calcDirectionWindowed();
+
+    int uart_handle(-1);
+    uart_handle = init_uart();
+    if(uart_handle==-1) return -1;
 
     VideoCapture cap(1);
     if(!cap.isOpened()){
@@ -20,12 +20,13 @@ int main(){
     }
     Mat frameBuffer;
     float dir = 0;
-
+    unsigned char data = 7; //7 is straight
     while(1){
         dir = calcDirection(frameBuffer, cap);
         std::cout << "Direction is: " << dir << '\n';
+        data = 7 + (char)(dir/4.28);
+        uart_write(uart_handle, data);
     }
-
     return 0;
 }
 
@@ -172,6 +173,38 @@ float calcDirection(Mat buff, VideoCapture cap){
     */
 
     return direction;
+}
+
+
+//returns handle to filestream
+int init_uart(){
+    int handle = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY | O_NDELAY); //Initialisierung der UART
+    if (handle == -1) {
+        std::cout << "[ERROR] UART open()\n";
+    }else{
+        struct termios options;
+        tcgetattr(handle, &options);
+        options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+        options.c_iflag = IGNPAR;
+        options.c_oflag = 0;
+        options.c_lflag = 0;
+        tcflush(handle, TCIFLUSH);
+        tcsetattr(handle, TCSANOW, &options);
+    }
+    return handle;
+}
+
+int uart_write(int handle, unsigned char data){
+    if(handle==-1){
+        std::cout << "[ERROR] invalid handle\n";
+        return -1;
+    }
+    int out = write(handle, &data, 1);
+    if(out!=1){
+        std::cout << "[ERROR] write data uart\n";
+        return -1;
+    }
+    return 1;
 }
 
 
