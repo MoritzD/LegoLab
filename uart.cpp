@@ -5,7 +5,7 @@
  *      Author: Berkay
  */
 
-#include "uart.h"
+//#include "uart.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +24,7 @@ if (uart0_filestream == -1) {
 
 struct termios options;
 tcgetattr(uart0_filestream, &options);
-	options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+	options.c_cflag = B115200 | CS8 | CLOCAL | CREAD;
 	options.c_iflag = IGNPAR;
 	options.c_oflag = 0;
 	options.c_lflag = 0;
@@ -33,16 +33,22 @@ tcsetattr(uart0_filestream, TCSANOW, &options);
 
 
 // sendung bytes über tx-pin
-unsigned char BUF_TX[5];
+unsigned char BUF_TX[7];
 unsigned char *TX;
 
 TX = &BUF_TX[0];
-*TX++ = 'HELLO';
-*TX++ = 'Probe!!!!!!';
+*TX++ = 'H';
+*TX++ = 'e';
+*TX++ = 'l';
+*TX++ = 'l';
+*TX++ = 'o';
+*TX++ = '\n';
+*TX++ = '\r';
 
 
 if (uart0_filestream != -1)	{
-	int out = write(uart0_filestream, &BUF_TX[0], (TX - &BUF_TX[0])); //macht das Senden, out zaehlt die geschriebene bytes
+	int out = 0;
+	out = write(uart0_filestream, &BUF_TX[0], (TX - &BUF_TX[0])); //macht das Senden, out zaehlt die geschriebene bytes
 	if (out < 0) {
 		printf("[ERROR] UART TX\n");
 	} else {
@@ -56,8 +62,12 @@ sleep(1);
 // Bytes empfangen
 if (uart0_filestream != -1) {
 	unsigned char BUF_RX[50];
-	int rx_length = read(uart0_filestream, (void*)BUF_RX, 50); //rx_length zaehlt ankommenden bytes
-//UBERPRÜFUNG, 0'dan kucukse bir hata var, 0'dan buyukse daha fayla bytes gelemiyor
+
+	int rx_length = 0;
+	while(rx_length <= 0){
+		rx_length = read(uart0_filestream, (void*)BUF_RX, 50); //rx_length zaehlt ankommenden bytes
+	}
+//UBERPRueFUNG, 0'dan kucukse bir hata var, 0'dan buyukse daha fayla bytes gelemiyor
 	if (rx_length < 0) {
 		printf("[ERROR] UART RX\n");
 	} else if (rx_length == 0) {
