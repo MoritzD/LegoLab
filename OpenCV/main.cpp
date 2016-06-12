@@ -9,9 +9,11 @@ const Mat LINE_DETECTION_MASK = (Mat_<char>(3,3) << -1,0,1,-2,0,2,-1,0,1);
 int main(){
     //calcDirectionWindowed();
 
+
     int uart_handle(-1);
     uart_handle = init_uart();
     if(uart_handle==-1) return -1;
+
 
     VideoCapture cap(1);
     if(!cap.isOpened()){
@@ -19,12 +21,16 @@ int main(){
         return -1;
     }
     Mat frameBuffer;
-    float dir = 0;
+    //influence of new direction
+    float alpha = 0.2;
+    float cur_dir, new_dir = 0;
     unsigned char data = 7; //7 is straight
     while(1){
-        dir = calcDirection(frameBuffer, cap);
-        std::cout << "Direction is: " << dir << '\n';
-        data = 7 + (char)(dir/4.28);
+        new_dir = calcDirection(frameBuffer, cap);
+        cur_dir = (1-alpha) * cur_dir + alpha * new_dir;
+        std::cout << "new direction is: " << new_dir << '\n';
+        std::cout << "driving direction is " << cur_dir << '\n';
+        data = 7 + (char)(cur_dir/4.28);
         uart_write(uart_handle, data);
     }
     return 0;
@@ -100,7 +106,8 @@ void calcDirectionWindowed()
 
         Point2i min_point1 = cvPoint(min_line[2]+ 200*min_line[0], min_line[3] + 200*min_line[1]);
         Point2i min_point2 = cvPoint(min_line[2]- 200*min_line[0], min_line[3] - 200*min_line[1]);
-        Point2i car_position = cvPoint(image.rows/2, image.cols);
+        Point2i car_position = cvPoint(image.cols/2, image.rows);
+
         line(image, max_point1, max_point2, CV_RGB(255,0,0), 1,8,0); //max line (red)
         line(image, min_point1, min_point2, CV_RGB(0,255,0), 1,8,0); //min line (yellow)
         line(image, car_position, max_point1, CV_RGB(0,0,255), 2, 8, 0); //direction of car (blue)
@@ -158,7 +165,7 @@ float calcDirection(Mat buff, VideoCapture cap){
     if(max_point.y>max_pointb.y) max_point = max_pointb;
 
     //estimated position of car (TODO)
-    Point2i car_position = cvPoint(buff.rows/2, buff.cols);
+    Point2i car_position = cvPoint(buff.cols/2, buff.rows);
 
     //Calculate driving direction
     Vec2f car_direction(max_point.x-car_position.x, max_point.y-car_position.y);
