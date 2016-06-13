@@ -16,14 +16,14 @@ int main(){
 
 
 
-    VideoCapture cap(1);
+    VideoCapture cap(0);
     if(!cap.isOpened()){
         std::cout << "Could not open video stream!\n";
         return -1;
     }
     Mat frameBuffer;
     //influence of new direction
-    float alpha = 0.2;
+    float alpha = 1.0;
     float cur_dir, new_dir = 0;
     unsigned char data = 7; //7 is straight
     while(1){
@@ -31,7 +31,7 @@ int main(){
         cur_dir = (1-alpha) * cur_dir + alpha * new_dir;
         std::cout << "new direction is: " << new_dir << '\n';
         std::cout << "driving direction is " << cur_dir << '\n';
-        data = map_angle(cur_dir, 5.0);
+        data = map_angle(cur_dir, 5.0, 0.5);
 
         std::cout << "Uart data is: " << (int) data << std::endl;
 
@@ -42,7 +42,7 @@ int main(){
 
 void calcDirectionWindowed()
 {
-    VideoCapture cap(1);
+    VideoCapture cap(0);
 
     if(!cap.isOpened()){
         std::cout << "Could not open video stream!\n";
@@ -124,7 +124,7 @@ void calcDirectionWindowed()
 
         Vec2f car_direction(max_point1.x-car_position.x, max_point1.y-car_position.y);
         normalize(car_direction, car_direction, 1, NORM_L1);
-        float direction = std::copysignf(std::acos(std::abs(car_direction[1])), car_direction[0]);
+        float direction = copysignf(std::acos(std::abs(car_direction[1])), car_direction[0]);
         direction = direction * 180 / M_PI;
         std::cout << "The calculated direction is: " << direction << '\n';
 
@@ -143,7 +143,7 @@ float calcDirection(Mat buff, VideoCapture cap){
     std::vector<Point2i> max_points(buff.rows-2);
     char max_value = 0;
     char current_value = 0;
-    int x_max = 0;
+    int x_max, count = 0;
     for(int j = 1; j<buff.rows-1; j++){ //edges not interpolated
         max_value = 0;
         x_max = 0;
@@ -154,18 +154,25 @@ float calcDirection(Mat buff, VideoCapture cap){
                 x_max = i;
             }
         }
-        max_points[j-1] = cvPoint(x_max, j-1);
+	if(max_value>25) max_points[count++] = cvPoint(x_max, j-1);
     }
+    std::cout <<"Vector size: " << count;
+	if( count < 2){
+		count = 2;
+		max_points[0] = cvPoint(buff.cols/2, 0);
+		max_points[1] = cvPoint(buff.cols/2, buff.rows);
+	}
+    max_points.resize(count);
 
     //Fit line on max_points
     Vec4f max_line;
     fitLine(max_points, max_line, CV_DIST_L2, 0, 0.01, 0.01);
 
     //Point the car should drive to
-    Point2i max_point = cvPoint(max_line[2] - 200*max_line[0], max_line[3] - 200*max_line[1]);
+    Point2i max_point = cvPoint(max_line[2] - 300*max_line[0], max_line[3] - 300*max_line[1]);
 
     //make sure max_point is the further away one (line output does some weird shit)
-    Point2i max_pointb = cvPoint(max_line[2] + 200*max_line[0], max_line[3] + 200*max_line[1]);
+    Point2i max_pointb = cvPoint(max_line[2] + 300*max_line[0], max_line[3] + 300*max_line[1]);
     if(max_point.y>max_pointb.y) max_point = max_pointb;
 
     //estimated position of car (TODO)
@@ -174,7 +181,7 @@ float calcDirection(Mat buff, VideoCapture cap){
     //Calculate driving direction
     Vec2f car_direction(max_point.x-car_position.x, max_point.y-car_position.y);
     normalize(car_direction, car_direction, 1, NORM_L1);
-    float direction = std::copysignf(std::acos(std::abs(car_direction[1])), car_direction[0]);
+    float direction = copysignf(std::acos(std::abs(car_direction[1])), car_direction[0]);
     direction = direction * 180 / M_PI;
 
     /* Just for debugging
@@ -195,7 +202,7 @@ int init_uart(){
     }else{
         struct termios options;
         tcgetattr(handle, &options);
-        options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+        options.c_cflag = B115200 | CS8 | CLOCAL | CREAD;
         options.c_iflag = IGNPAR;
         options.c_oflag = 0;
         options.c_lflag = 0;
@@ -219,19 +226,21 @@ int uart_write(int handle, unsigned char data){
 }
 
 //map angle to level understood by the nanoboard
-unsigned char map_angle(float dir, float level_range){
+unsigned char map_angle(float dir, float level_range, float prog){
     unsigned char level(7); //straight
     float step(level_range);    //range of level (in degree)
     if(dir>0.0){
         while(dir>step && level<14){
             level++;
             dir-=step;
+	    if(step>prog) step-=prog;
         }
     }else{
         step *= -1;
         while(dir<step && level>0){
             level--;
             dir-=step;
+	    if(step<prog) step+=prog;
         }
     }
     return level;
