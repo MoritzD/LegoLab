@@ -23,7 +23,7 @@ int main(){
     }
     Mat frameBuffer;
     //influence of new direction
-    float alpha = 1.0;
+    float alpha = 0.5;
     float cur_dir, new_dir = 0;
     unsigned char data = 7; //7 is straight
     while(1){
@@ -144,15 +144,17 @@ float calcDirection(Mat buff, VideoCapture cap){
     char max_value = 0;
     char current_value = 0;
     int x_max, count = 0;
-    for(int j = 1; j<buff.rows-1; j++){ //edges not interpolated
+    for(int j = buff.rows-2; j>1; j--){ //edges not interpolated
         max_value = 0;
         x_max = 0;
         for(int i = 1; i < buff.cols-1; i++){
             current_value = buff.ptr<uchar>(j)[i];
-            if(max_value < current_value){
-                max_value = current_value;
-                x_max = i;
-            }
+	    if(!count>0 || (std::abs(max_points[count-1].x-i)<80 && std::abs(max_points[count-1].y-j)<50)){
+                if(max_value < current_value){
+                    max_value = current_value;
+                    x_max = i;
+                }
+	    }
         }
 	if(max_value>25) max_points[count++] = cvPoint(x_max, j-1);
     }
@@ -169,10 +171,10 @@ float calcDirection(Mat buff, VideoCapture cap){
     fitLine(max_points, max_line, CV_DIST_L2, 0, 0.01, 0.01);
 
     //Point the car should drive to
-    Point2i max_point = cvPoint(max_line[2] - 300*max_line[0], max_line[3] - 300*max_line[1]);
+    Point2i max_point = cvPoint(max_line[2] - 200*max_line[0], max_line[3] - 200*max_line[1]);
 
     //make sure max_point is the further away one (line output does some weird shit)
-    Point2i max_pointb = cvPoint(max_line[2] + 300*max_line[0], max_line[3] + 300*max_line[1]);
+    Point2i max_pointb = cvPoint(max_line[2] + 200*max_line[0], max_line[3] + 200*max_line[1]);
     if(max_point.y>max_pointb.y) max_point = max_pointb;
 
     //estimated position of car (TODO)
