@@ -15,6 +15,7 @@ int main(){
     if(uart_handle==-1) return -1;
 
 
+
     VideoCapture cap(1);
     if(!cap.isOpened()){
         std::cout << "Could not open video stream!\n";
@@ -30,7 +31,10 @@ int main(){
         cur_dir = (1-alpha) * cur_dir + alpha * new_dir;
         std::cout << "new direction is: " << new_dir << '\n';
         std::cout << "driving direction is " << cur_dir << '\n';
-        data = 7 + (char)(cur_dir/4.28);
+        data = map_angle(cur_dir, 5.0);
+
+        std::cout << "Uart data is: " << (int) data << std::endl;
+
         uart_write(uart_handle, data);
     }
     return 0;
@@ -212,6 +216,25 @@ int uart_write(int handle, unsigned char data){
         return -1;
     }
     return 1;
+}
+
+//map angle to level understood by the nanoboard
+unsigned char map_angle(float dir, float level_range){
+    unsigned char level(7); //straight
+    float step(level_range);    //range of level (in degree)
+    if(dir>0.0){
+        while(dir>step && level<14){
+            level++;
+            dir-=step;
+        }
+    }else{
+        step *= -1;
+        while(dir<step && level>0){
+            level--;
+            dir-=step;
+        }
+    }
+    return level;
 }
 
 
