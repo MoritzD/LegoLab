@@ -7,7 +7,7 @@ using namespace cv;
 const Mat LINE_DETECTION_MASK = (Mat_<char>(3,3) << -1,0,1,-2,0,2,-1,0,1);
 
 int main(){
-    //calcDirectionWindowed();
+    calcDirectionWindowed();
 
 
     int uart_handle(-1);
@@ -16,14 +16,14 @@ int main(){
 
 
 
-    VideoCapture cap(0);
+    VideoCapture cap(1);
     if(!cap.isOpened()){
         std::cout << "Could not open video stream!\n";
         return -1;
     }
     Mat frameBuffer;
     //influence of new direction
-    float alpha = 0.5;
+    float alpha = 0.2;
     float cur_dir, new_dir = 0;
     unsigned char data = 7; //7 is straight
     while(1){
@@ -31,7 +31,7 @@ int main(){
         cur_dir = (1-alpha) * cur_dir + alpha * new_dir;
         std::cout << "new direction is: " << new_dir << '\n';
         std::cout << "driving direction is " << cur_dir << '\n';
-        data = map_angle(cur_dir, 5.0, 0.5);
+        data = map_angle(cur_dir, 5.0);
 
         std::cout << "Uart data is: " << (int) data << std::endl;
 
@@ -42,7 +42,7 @@ int main(){
 
 void calcDirectionWindowed()
 {
-    VideoCapture cap(0);
+    VideoCapture cap(1);
 
     if(!cap.isOpened()){
         std::cout << "Could not open video stream!\n";
@@ -56,12 +56,21 @@ void calcDirectionWindowed()
 
     namedWindow("Original", CV_WINDOW_AUTOSIZE);
     namedWindow("Window", CV_WINDOW_AUTOSIZE);
+    namedWindow("Debug", CV_WINDOW_AUTOSIZE);
 
     while(1){
         cap >> frame; //get frame
         GaussianBlur(frame, image, Size2i(5,5),0,0, BORDER_DEFAULT); //apply gaussian filter
+
+
         filter2D(image, image, frame.depth(), mask); //aply maks
         cvtColor(image, image, CV_RGB2GRAY, 1); //reduce color to one channel
+
+
+
+
+
+
 
         //calc max and min points for each row
         std::vector<Point2i> max_points(image.rows-2);
@@ -71,25 +80,39 @@ void calcDirectionWindowed()
         char current_value = 0;
         int x_min = 0;
         int x_max = 0;
-        for(int j = 1; j<image.rows-1; j++){ //edges not interpolated
+        int c = 0;
+        for(int j = image.rows-2; j>1; j--){ //edges not interpolated
             max_value = 0;
             min_value = CHAR_MAX;
             x_min = 0;
             x_max = 0;
             for(int i = 1; i < image.cols-1; i++){
                 current_value = image.ptr<uchar>(j)[i];
-                if(max_value < current_value){
-                    max_value = current_value;
-                    x_max = i;
+                if(!c>0 || (std::abs(max_points[c-1].x-i)<80 && std::abs(max_points[c-1].y-j)<50)){
+                    if(max_value < current_value){
+                        max_value = current_value;
+                        x_max = i;
+                    }
                 }
                 if(min_value > current_value){
                     min_value = current_value;
                     x_min = i;
                 }
             }
-            max_points[j-1] = cvPoint(x_max, j-1);
+
+            if(max_value>25) max_points[c++] = cvPoint(x_max, j-1);
             min_points[j-1] = cvPoint(x_min, j-1);
         }
+
+        max_points.resize(c);
+        Mat debug;
+        cvtColor(image, debug, CV_GRAY2RGB, 3);
+        for(unsigned int i = 0; i<max_points.size(); i++){
+            circle(debug, max_points[i], 1, CV_RGB(255,255,0), 1, 8, 0);
+        }
+        imshow("Debug", debug);
+        std::cout << "Number of Points: " << c << std::endl;
+
 
         //calculate lines
         Vec4f max_line;
@@ -100,7 +123,7 @@ void calcDirectionWindowed()
         cvtColor(image, image, CV_GRAY2RGB, 3); //three channels are needed to draw colored lines
 
         //draw min- and max-lines on the image
-        Point2i max_point1 = cvPoint(max_line[2]- 200*max_line[0], max_line[3] - 200*max_line[1]);
+        Point2i max_point1 = cvPoint(max_line[2]- 200*max_line[0], max_line[3] - 2-00*max_line[1]);
         Point2i max_point2 = cvPoint(max_line[2]+ 200*max_line[0], max_line[3] + 200*max_line[1]);
         if(max_point1.y>max_point2.y){
             Point2i buff = max_point2;
@@ -124,10 +147,10 @@ void calcDirectionWindowed()
 
         Vec2f car_direction(max_point1.x-car_position.x, max_point1.y-car_position.y);
         normalize(car_direction, car_direction, 1, NORM_L1);
-        float direction = copysignf(std::acos(std::abs(car_direction[1])), car_direction[0]);
+        float direction = std::copysignf(std::acos(std::abs(car_direction[1])), car_direction[0]);
         direction = direction * 180 / M_PI;
         std::cout << "The calculated direction is: " << direction << '\n';
-
+        std::cout << "Uart data would be: " << (int)map_angle(direction, 4.0) << std::endl;
     }
 }
 
@@ -143,28 +166,19 @@ float calcDirection(Mat buff, VideoCapture cap){
     std::vector<Point2i> max_points(buff.rows-2);
     char max_value = 0;
     char current_value = 0;
-    int x_max, count = 0;
-    for(int j = buff.rows-2; j>1; j--){ //edges not interpolated
+    int x_max = 0;
+    for(int j = 1; j<buff.rows-1; j++){ //edges not interpolated
         max_value = 0;
         x_max = 0;
         for(int i = 1; i < buff.cols-1; i++){
             current_value = buff.ptr<uchar>(j)[i];
-	    if(!count>0 || (std::abs(max_points[count-1].x-i)<80 && std::abs(max_points[count-1].y-j)<50)){
-                if(max_value < current_value){
-                    max_value = current_value;
-                    x_max = i;
-                }
-	    }
+            if(max_value < current_value){
+                max_value = current_value;
+                x_max = i;
+            }
         }
-	if(max_value>25) max_points[count++] = cvPoint(x_max, j-1);
+        max_points[j-1] = cvPoint(x_max, j-1);
     }
-    std::cout <<"Vector size: " << count;
-	if( count < 2){
-		count = 2;
-		max_points[0] = cvPoint(buff.cols/2, 0);
-		max_points[1] = cvPoint(buff.cols/2, buff.rows);
-	}
-    max_points.resize(count);
 
     //Fit line on max_points
     Vec4f max_line;
@@ -183,7 +197,7 @@ float calcDirection(Mat buff, VideoCapture cap){
     //Calculate driving direction
     Vec2f car_direction(max_point.x-car_position.x, max_point.y-car_position.y);
     normalize(car_direction, car_direction, 1, NORM_L1);
-    float direction = copysignf(std::acos(std::abs(car_direction[1])), car_direction[0]);
+    float direction = std::copysignf(std::acos(std::abs(car_direction[1])), car_direction[0]);
     direction = direction * 180 / M_PI;
 
     /* Just for debugging
@@ -228,21 +242,19 @@ int uart_write(int handle, unsigned char data){
 }
 
 //map angle to level understood by the nanoboard
-unsigned char map_angle(float dir, float level_range, float prog){
+unsigned char map_angle(float dir, float level_range){
     unsigned char level(7); //straight
     float step(level_range);    //range of level (in degree)
     if(dir>0.0){
         while(dir>step && level<14){
             level++;
             dir-=step;
-	    if(step>prog) step-=prog;
         }
     }else{
         step *= -1;
         while(dir<step && level>0){
             level--;
             dir-=step;
-	    if(step<prog) step+=prog;
         }
     }
     return level;
