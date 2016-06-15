@@ -12,7 +12,6 @@ int main()
 	printf("Running!\n");
 
 
-	drive_by_rasp_input();
 
 
 	return 0;
@@ -29,8 +28,6 @@ void drive_by_sensors(){
 	//Assign steering pins
 	unsigned long s_phase1=0x0,s_phase2=0x000,s_duty1=0x0,s_duty2=0x0,s_period=0x186A,s_enable=0x3;
 	steering_setting(s_phase1,s_duty1,s_phase2,s_duty2,s_period,s_enable);
-
-
 
 	//Intit Ultrasound
 	unsigned int distance0, distance1, distance2, i, j = 0;
@@ -64,6 +61,42 @@ void drive_by_sensors(){
 		}else{
 			m_duty1 = 0x0;
 		}
+        
+        //Adaptive Cruise Control 1
+        /*if (distance0>500000) {
+            m_duty1 = 6250;
+        }else if{distance0<=500000 && distance0>50000)
+            m_duty1 = 6250 - (6250*(500000-distance0))
+        }
+        else{
+            m_duty1 = 0;
+        }*/
+        
+        //Adaptive Cruise Control 2
+        /*if (distance0>500000) {
+            m_duty1 = 6250;
+        }else if(distance0<=500000 && distance0>350000){
+            m_duty1 = 4687.5;
+        }else if(distance0<=350000 && distance0>200000){
+            m_duty1 = 3125;
+        }else if(distance0<=200000 && distance0>50000){
+            m_duty1 = 1562.5;
+        }else{
+            m_duty1 = 0;
+        }*/
+        
+        
+        //Adaptive Cruise Cont      rol 3
+        /*if (distance0>500000) {
+         m_duty1 = 6250;
+         }else if{distance0<=500000 && distance0>50000)
+            while(distance0!=500000){                      //to maintain a constant distance
+            m_duty1 = 6250 - (6250*(500000-distance0))
+            distance0 = ultrasound_read(NEW_ULTRASOUND0_BASE) * 170;
+            }
+         }else{
+         m_duty1 = 0;
+         }*/
 
 
 		if(distance1>893){ //893 is about 0,15181m
@@ -114,19 +147,24 @@ void drive_by_rasp_input(){
 
 		distance = ultrasound_read(NEW_ULTRASOUND0_BASE);
 
-		printf("Sensor value is: %i\n", distance);
-
 		//Check for collision
-		if(distance > 800){
-			m_duty1=3500;
+		/*if(distance > 300){
+			m_duty1=0x186A;
 		}else{
 			m_duty1=0;
-		}
+		}*/
+        
+        //Adaptive Cruise Control 1
+        if (distance0>600000) {
+            m_duty1 = 3500;
+        }else if{distance0<=600000 && distance0>130000)
+            m_duty1 = 3500 - (3500*(600000-distance0))
+        }else{
+            m_duty1 = 0;
+        }
 
 		//Set steering PWM signal
-		unsigned char input = raspberry_read(UART_0_BASE);
-		steering_set_level(input);
-		printf("Uart input is:%i\n", (int)input); //for testing TODO
+		steering_set_level(raspberry_read(UART_0_BASE));
 
 		//Set motor PWM signal
 		motor_setting(m_phase1,m_duty1,m_phase2,m_duty2,m_period,m_enable);
