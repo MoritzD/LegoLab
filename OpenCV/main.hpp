@@ -10,6 +10,7 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui.hpp"
 
+
 void calcDirectionWindowed();
 float calcDirection(cv::Mat buff, cv::VideoCapture cap);
 int init_uart();
