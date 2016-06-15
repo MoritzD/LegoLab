@@ -1,4 +1,6 @@
 #include "main.hpp"
+#include <pthread.h>
+
 
 #define VIDEO_DEVICE_NUM 0 //number of video device
 #define ALPHA 0.9 //0.6   //influence of new direction
@@ -21,7 +23,13 @@ const float alpha(ALPHA);    //influence of new direction
 int main(){
     //calcDirectionWindowed();
 
-
+/*    pthread_t threads[4];
+    struct args
+    {   
+      // Argument for threads  
+        
+    };
+*/
     int uart_handle(-1);
     uart_handle = init_uart();
     if(uart_handle==-1) return -1;
@@ -36,6 +44,12 @@ int main(){
     Mat frameBuffer;
     float cur_dir, new_dir = 0;
     unsigned char data = 7; //7 is straight
+/*    for(int i = 0; i < 4; i++){
+        pthread_create(threads + i, NULL ,&calcDirectionThread,args);   
+    }
+*/    
+
+
     while(1){
         new_dir = calcDirection(frameBuffer, cap);
         cur_dir = (1-alpha) * cur_dir + alpha * new_dir;
