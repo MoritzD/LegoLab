@@ -145,7 +145,7 @@ void drive_by_rasp_input(){
 
 	while(1){
 
-		distance = ultrasound_read(NEW_ULTRASOUND0_BASE);
+		distance = ultrasound_read(NEW_ULTRASOUND0_BASE) * 170;
 
 		//Check for collision
 		/*if(distance > 300){
@@ -155,12 +155,25 @@ void drive_by_rasp_input(){
 		}*/
         
         //Adaptive Cruise Control 1
-        if (distance0>600000) {
-            m_duty1 = 3500;
+        /*if (distance0>600000) {
+            m_duty1 = 5500;
         }else if{distance0<=600000 && distance0>130000)
-            m_duty1 = 3500 - (3500*(600000-distance0))
+            m_duty1 = 5500 - (5500*(600000-distance0))
         }else{
             m_duty1 = 0;
+        }*/
+        
+        //Adaptive Cruise Control 2
+        if (distance0>500000) {
+            m_duty1 = 5500;
+        }else if(distance0<=500000 && distance0>350000){
+            m_duty1 = 4000;
+        }else if(distance0<=350000 && distance0>200000){
+            m_duty1 = 2500;
+        }else if(distance0<=200000 && distance0>130000){
+            m_duty1 = 1000;
+        }else{
+         m_duty1 = 0;
         }
 
 		//Set steering PWM signal
