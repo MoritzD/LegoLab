@@ -1,14 +1,16 @@
 #include "main.hpp"
 
-#define VIDEO_DEVICE_NUM 1 //number of video device
-#define ALPHA 0.6   //influence of new direction
+#define VIDEO_DEVICE_NUM 0 //number of video device
+#define ALPHA 0.9 //0.6   //influence of new direction
 #define STEERING_LEVEL_SIZE 5.0 //size of a discrete steering level
 #define STEERING_LEVEL_SIZE_PROGRESSION 0.5 //dif size between progressing steering levels
 #define MIN_GRADIENT_THRESHOLD 25 //points with lower gradient value are not considert to be a edge of the line
 #define MAX_POINT_DISTANCE_Y 50 //maximum distance between two neighbouring points on y-axis
 #define MAX_POINT_DISTANCE_X 80 //maximum distance between two neighbouring points on x-axis
+#define UARTDEV "/dev/ttyAMA0"	// The device file for the UART connection to the Hano board.
 
-
+//#define debug
+//#define output
 using namespace cv;
 
 
@@ -37,13 +39,15 @@ int main(){
     while(1){
         new_dir = calcDirection(frameBuffer, cap);
         cur_dir = (1-alpha) * cur_dir + alpha * new_dir;
-        std::cout << "------------------------------------------------\n";
+#ifdef output
+	std::cout << "------------------------------------------------\n";
         std::cout << "new direction is: " << new_dir << '\n';
         std::cout << "driving direction is " << cur_dir << '\n';
+#endif
         data = map_angle(cur_dir, STEERING_LEVEL_SIZE, STEERING_LEVEL_SIZE_PROGRESSION);
-
+#ifdef output
         std::cout << "Uart data is: " << (int) data << std::endl;
-
+#endif
         uart_write(uart_handle, data);
     }
     return 0;
@@ -144,7 +148,7 @@ float calcDirection(Mat buff, VideoCapture cap){
 
 
     cap >> buff; //get frame
-    GaussianBlur(buff, buff, Size2i(5,5),0,0, BORDER_DEFAULT); //apply gaussian filter
+//    GaussianBlur(buff, buff, Size2i(5,5),0,0, BORDER_DEFAULT); //apply gaussian filter
     filter2D(buff, buff, buff.depth(), LINE_DETECTION_MASK); //aply maks
     cvtColor(buff, buff, CV_RGB2GRAY, 1); //reduce color to one channel
 
@@ -168,7 +172,9 @@ float calcDirection(Mat buff, VideoCapture cap){
         }
         if(max_value>MIN_GRADIENT_THRESHOLD) max_points[point_count++] = cvPoint(x_max, j-1); //point is not added if gradient to small
     }
+#ifdef output
     std::cout <<"Vector size: " << point_count << '\n'; //TODO just for debugging
+#endif
 	if( point_count < 2){
 		point_count = 2;
 		max_points[0] = cvPoint(buff.cols/2, 0);
@@ -197,7 +203,7 @@ float calcDirection(Mat buff, VideoCapture cap){
     direction = direction * 180 / M_PI;
 
     // Just for debugging
-
+#ifdef debug
     Mat debug;
     cvtColor(buff, debug, CV_GRAY2RGB, 3);
     for(unsigned int i = 0; i<max_points.size(); i++){
@@ -206,7 +212,7 @@ float calcDirection(Mat buff, VideoCapture cap){
     namedWindow("Debug", WINDOW_AUTOSIZE);
     imshow("Debug", debug);
     waitKey(10);
-
+#endif
 
     return direction;
 }
@@ -214,7 +220,7 @@ float calcDirection(Mat buff, VideoCapture cap){
 
 //returns handle to filestream
 int init_uart(){
-    int handle = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY); //Initialisierung der UART
+    int handle = open(UARTDEV, O_RDWR | O_NOCTTY | O_NDELAY); //Initialisierung der UART
     if (handle == -1) {
         std::cout << "[ERROR] UART open()\n";
     }else{
