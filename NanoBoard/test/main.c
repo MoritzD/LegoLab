@@ -12,6 +12,7 @@ int main()
 	printf("Running!\n");
 
 
+	drive_by_rasp_input();
 
 
 	return 0;
@@ -28,6 +29,8 @@ void drive_by_sensors(){
 	//Assign steering pins
 	unsigned long s_phase1=0x0,s_phase2=0x000,s_duty1=0x0,s_duty2=0x0,s_period=0x186A,s_enable=0x3;
 	steering_setting(s_phase1,s_duty1,s_phase2,s_duty2,s_period,s_enable);
+
+
 
 	//Intit Ultrasound
 	unsigned int distance0, distance1, distance2, i, j = 0;
@@ -111,15 +114,19 @@ void drive_by_rasp_input(){
 
 		distance = ultrasound_read(NEW_ULTRASOUND0_BASE);
 
+		printf("Sensor value is: %i\n", distance);
+
 		//Check for collision
-		if(distance > 300){
-			m_duty1=0x186A;
+		if(distance > 800){
+			m_duty1=3500;
 		}else{
 			m_duty1=0;
 		}
 
 		//Set steering PWM signal
-		steering_set_level(raspberry_read(UART_0_BASE));
+		unsigned char input = raspberry_read(UART_0_BASE);
+		steering_set_level(input);
+		printf("Uart input is:%i\n", (int)input); //for testing TODO
 
 		//Set motor PWM signal
 		motor_setting(m_phase1,m_duty1,m_phase2,m_duty2,m_period,m_enable);
