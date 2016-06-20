@@ -3,7 +3,7 @@
 
 
 #define VIDEO_DEVICE_NUM 0 //number of video device
-#define ALPHA 0.9 //0.6   //influence of new direction
+#define ALPHA 0.4 //0.6   //influence of new direction
 #define STEERING_LEVEL_SIZE 5.0 //size of a discrete steering level
 #define STEERING_LEVEL_SIZE_PROGRESSION 0.5 //dif size between progressing steering levels
 #define MIN_GRADIENT_THRESHOLD 25 //points with lower gradient value are not considert to be a edge of the line
@@ -14,7 +14,8 @@
 
 
 //#define debug
-#define output
+//#define output
+#define UART
 using namespace cv;
 
 
@@ -32,11 +33,11 @@ std::mutex cur_dir_mutex;
 int main(){
     //calcDirectionWindowed();
 
-/*
+#ifdef UART
     int uart_handle(-1);
     uart_handle = init_uart();
     if(uart_handle==-1) return -1;
-*/
+#endif
 
 
     if(!cap.isOpened()){
@@ -61,11 +62,12 @@ int main(){
         std::cout << "driving direction is " << cur_dir << '\n';
         std::cout << "Uart data is: " << (int) data << std::endl;
 #endif
-        //uart_write(uart_handle, data);
+#ifdef UART
+        uart_write(uart_handle, data);
+#endif
 
 
-
-        sleep(1);
+        usleep(70000);
     }
     return 0;
 }
