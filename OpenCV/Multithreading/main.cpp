@@ -309,6 +309,11 @@ void threadMainLoop(Mat buff){
 		  if(tp_last_frame.tv_sec < frame_tp.tv_sec ||
 				(tp_last_frame.tv_sec==frame_tp.tv_sec && tp_last_frame.tv_usec<frame_tp.tv_usec)){
         		current_Direction = alpha * new_dir + (1-alpha) * current_Direction;
+#ifdef output
+				long long last_frame_time = tp_last_frame.tv_sec*1000 + tp_last_frame.tv_usec/1000;
+				long long current_frame_time = frame_tp.tv_sec*1000 + frame_tp.tv_usec/1000;
+				std::cout << "Time difference betweeten two frames is: " << current_frame_time-last_frame_time << std::endl;
+#endif
 				tp_last_frame = frame_tp;
 		  }else{
 #ifdef output
