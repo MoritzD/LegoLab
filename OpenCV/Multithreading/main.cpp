@@ -310,6 +310,11 @@ void threadMainLoop(Mat buff){
 				(tp_last_frame.tv_sec==frame_tp.tv_sec && tp_last_frame.tv_usec<frame_tp.tv_usec)){
         		current_Direction = alpha * new_dir + (1-alpha) * current_Direction;
 				tp_last_frame = frame_tp;
+				last_updated = frame_time;
+		  }else{
+#ifdef output
+				std::cout << "Frame got deleted\n";
+#endif
 		  }
         cur_dir_mutex.unlock();
     }
