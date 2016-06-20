@@ -10,13 +10,13 @@
 #define MAX_POINT_DISTANCE_Y 50 //maximum distance between two neighbouring points on y-axis
 #define MAX_POINT_DISTANCE_X 80 //maximum distance between two neighbouring points on x-axis
 #define UARTDEV "/dev/ttyAMA0"	// The device file for the UART connection to the Hano board.
-#define THREAD_NUMBER 4
+#define THREAD_NUMBER 8
 
 
 
 //#define DEBUG
 #define output
-#define UART
+//#define UART
 
 using namespace cv;
 
@@ -59,8 +59,12 @@ int main(){
     for(int i = 0; i<THREAD_NUMBER; i++){
         threads[i] = std::thread(threadMainLoop, thread_buffer[i]);
     }
+
     float cur_dir(0.0);
+
     while(1){
+
+	
         cur_dir_mutex.lock();
         cur_dir = current_Direction;
         cur_dir_mutex.unlock();
@@ -77,7 +81,7 @@ int main(){
 		  std::unique_lock<std::mutex> lock(cond_mutex);
 		  cond_var.wait(lock);
 		  lock.unlock();
-        
+		  
     }
     return 0;
 }
@@ -312,18 +316,21 @@ void threadMainLoop(Mat buff){
 		  gettimeofday(&frame_tp, NULL);
         cap_mutex.unlock();
 	
-		  
+#ifdef output	
+		  std::clock_t c_start = std::clock(); 		  
+#endif
+
         new_dir = calcDirection(buff);
+
+#ifdef output
+		  std::clock_t c_stop = std::clock();
+		  std::cout << "Thread calculated frame for " << 1000.0*(c_stop-c_start) /CLOCKS_PER_SEC << " ms\n";
+#endif
 
         cur_dir_mutex.lock();
 		  if(tp_last_frame.tv_sec < frame_tp.tv_sec ||
 				(tp_last_frame.tv_sec==frame_tp.tv_sec && tp_last_frame.tv_usec<frame_tp.tv_usec)){
         		current_Direction = alpha * new_dir + (1-alpha) * current_Direction;
-#ifdef output
-				long long last_frame_time = tp_last_frame.tv_sec*1000 + tp_last_frame.tv_usec/1000;
-				long long current_frame_time = frame_tp.tv_sec*1000 + frame_tp.tv_usec/1000;
-				std::cout << "Time difference betweeten two frames is: " << current_frame_time-last_frame_time << std::endl;
-#endif
 				tp_last_frame = frame_tp;
 				cond_var.notify_all();
 		  }else{
