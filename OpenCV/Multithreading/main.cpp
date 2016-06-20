@@ -13,9 +13,11 @@
 #define THREAD_NUMBER 4
 
 
+
 //#define DEBUG
 #define output
-//#define UART
+#define UART
+
 using namespace cv;
 
 
@@ -326,7 +328,7 @@ void threadMainLoop(Mat buff){
 				cond_var.notify_all();
 		  }else{
 #ifdef output
-				std::cout << "Frame got deleted\n";
+				std::cout << "                                                  Frame got deleted\n";
 #endif
 		  }
         cur_dir_mutex.unlock();
