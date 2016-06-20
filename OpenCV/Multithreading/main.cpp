@@ -26,12 +26,14 @@ VideoCapture cap(VIDEO_DEVICE_NUM);
 std::mutex cap_mutex;
 
 float current_Direction(0.0);
-int last_updated = time(NULL);
+struct timeval tp_last_frame;
 std::mutex cur_dir_mutex;
 
 
 
 int main(){
+
+	  gettimeofday(&tp_last_frame, NULL);
     //calcDirectionWindowed();
 
 #ifdef UART
@@ -297,13 +299,15 @@ void threadMainLoop(Mat buff){
     while(1){
         cap_mutex.lock();
         cap >> buff;
-		  frame_time = time(NULL);
+		  struct timeval frame_tp;
+		  gettimeofday(&frame_tp, NULL);
         cap_mutex.unlock();
 
         new_dir = calcDirection(buff);
 
         cur_dir_mutex.lock();
-		  if(last_updated < frame_time){
+		  if(tp_last_frame.tv_sec < frame_tp.tv_sec ||
+				(tp_last_frame.tv_sec==frame_tp.tv_sec && tp_last_frame.tv_usec<frame_tp.tvu_sec)){
         		current_Direction = alpha * new_dir + (1-alpha) * current_Direction;
 				last_updated = frame_time;
 		  }
