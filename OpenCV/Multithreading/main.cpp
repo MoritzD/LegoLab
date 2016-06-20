@@ -14,7 +14,7 @@
 
 
 //#define debug
-//#define output
+#define output
 #define UART
 using namespace cv;
 
@@ -312,7 +312,7 @@ void threadMainLoop(Mat buff){
 				tp_last_frame = frame_tp;
 		  }else{
 #ifdef output
-				std::cout << "Frame got deleted\n";
+				std::cout << "                                                  Frame got deleted\n";
 #endif
 		  }
         cur_dir_mutex.unlock();
