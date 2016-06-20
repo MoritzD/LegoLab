@@ -14,6 +14,7 @@
 #include <mutex>
 #include <time.h>
 #include <sys/time.h>
+#include <condition_variable>
 
 void calcDirectionWindowed();
 float calcDirection(cv::Mat buff);
