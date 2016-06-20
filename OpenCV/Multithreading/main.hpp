@@ -12,7 +12,7 @@
 #include <pthread.h>
 #include <thread>
 #include <mutex>
-
+#include <time.h>
 
 void calcDirectionWindowed();
 float calcDirection(cv::Mat buff);

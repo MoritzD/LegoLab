@@ -26,6 +26,7 @@ VideoCapture cap(VIDEO_DEVICE_NUM);
 std::mutex cap_mutex;
 
 float current_Direction(0.0);
+int last_updated = time(NULL);
 std::mutex cur_dir_mutex;
 
 
@@ -291,16 +292,21 @@ unsigned char map_angle(float dir, float level_range, float prog){
 
 void threadMainLoop(Mat buff){
     float new_dir(0.0);
+	 int frame_time = time(NULL);
 
     while(1){
         cap_mutex.lock();
         cap >> buff;
+		  frame_time = time(NULL);
         cap_mutex.unlock();
 
         new_dir = calcDirection(buff);
 
         cur_dir_mutex.lock();
-        current_Direction = alpha * new_dir + (1-alpha) * current_Direction;
+		  if(last_updated < frame_time){
+        		current_Direction = alpha * new_dir + (1-alpha) * current_Direction;
+				last_updated = frame_time;
+		  }
         cur_dir_mutex.unlock();
     }
 }
