@@ -2,7 +2,7 @@
 
 
 
-#define VIDEO_DEVICE_NUM 0 //number of video device
+#define VIDEO_DEVICE_NUM 1 //number of video device
 #define ALPHA 0.4 //0.6   //influence of new direction
 #define STEERING_LEVEL_SIZE 5.0 //size of a discrete steering level
 #define STEERING_LEVEL_SIZE_PROGRESSION 0//.5 //dif size between progressing steering levels
@@ -13,9 +13,9 @@
 #define THREAD_NUMBER 4
 
 
-//#define debug
-//#define output
-#define UART
+//#define DEBUG
+#define output
+//#define UART
 using namespace cv;
 
 
@@ -28,6 +28,9 @@ std::mutex cap_mutex;
 float current_Direction(0.0);
 struct timeval tp_last_frame;
 std::mutex cur_dir_mutex;
+
+std::condition_variable cond_var;
+std::mutex cond_mutex;
 
 
 
@@ -69,8 +72,10 @@ int main(){
         uart_write(uart_handle, data);
 #endif
 
-
-        usleep(70000);
+		  std::unique_lock<std::mutex> lock(cond_mutex);
+		  cond_var.wait(lock);
+		  lock.unlock();
+        
     }
     return 0;
 }
@@ -225,14 +230,16 @@ float calcDirection(Mat buff){
     direction = direction * 180 / M_PI;
 
     // Just for debugging
-#ifdef debug
+#ifdef DEBUG
     Mat debug;
     cvtColor(buff, debug, CV_GRAY2RGB, 3);
     for(unsigned int i = 0; i<max_points.size(); i++){
         circle(debug, max_points[i], 1, CV_RGB(255,255,0), 1, 8, 0);
     }
-    namedWindow("Debug", WINDOW_AUTOSIZE);
-    imshow("Debug", debug);
+	 std::stringstream ss;
+	 ss << std::this_thread::get_id();
+    namedWindow(ss.str(), WINDOW_AUTOSIZE);
+    imshow(ss.str(), debug);
     waitKey(10);
 #endif
 
@@ -302,7 +309,8 @@ void threadMainLoop(Mat buff){
 		  struct timeval frame_tp;
 		  gettimeofday(&frame_tp, NULL);
         cap_mutex.unlock();
-
+	
+		  
         new_dir = calcDirection(buff);
 
         cur_dir_mutex.lock();
@@ -315,6 +323,7 @@ void threadMainLoop(Mat buff){
 				std::cout << "Time difference betweeten two frames is: " << current_frame_time-last_frame_time << std::endl;
 #endif
 				tp_last_frame = frame_tp;
+				cond_var.notify_all();
 		  }else{
 #ifdef output
 				std::cout << "Frame got deleted\n";
