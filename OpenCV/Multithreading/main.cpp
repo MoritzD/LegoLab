@@ -5,7 +5,7 @@
 #define VIDEO_DEVICE_NUM 0 //number of video device
 #define ALPHA 0.4 //0.6   //influence of new direction
 #define STEERING_LEVEL_SIZE 5.0 //size of a discrete steering level
-#define STEERING_LEVEL_SIZE_PROGRESSION 0.5 //dif size between progressing steering levels
+#define STEERING_LEVEL_SIZE_PROGRESSION 0//.5 //dif size between progressing steering levels
 #define MIN_GRADIENT_THRESHOLD 25 //points with lower gradient value are not considert to be a edge of the line
 #define MAX_POINT_DISTANCE_Y 50 //maximum distance between two neighbouring points on y-axis
 #define MAX_POINT_DISTANCE_X 80 //maximum distance between two neighbouring points on x-axis
@@ -294,7 +294,7 @@ unsigned char map_angle(float dir, float level_range, float prog){
 
 void threadMainLoop(Mat buff){
     float new_dir(0.0);
-	 int frame_time = time(NULL);
+//	 int frame_time = time(NULL);
 
     while(1){
         cap_mutex.lock();
@@ -307,9 +307,9 @@ void threadMainLoop(Mat buff){
 
         cur_dir_mutex.lock();
 		  if(tp_last_frame.tv_sec < frame_tp.tv_sec ||
-				(tp_last_frame.tv_sec==frame_tp.tv_sec && tp_last_frame.tv_usec<frame_tp.tvu_sec)){
+				(tp_last_frame.tv_sec==frame_tp.tv_sec && tp_last_frame.tv_usec<frame_tp.tv_usec)){
         		current_Direction = alpha * new_dir + (1-alpha) * current_Direction;
-				last_updated = frame_time;
+				tp_last_frame = frame_tp;
 		  }
         cur_dir_mutex.unlock();
     }

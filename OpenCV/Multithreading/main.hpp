@@ -13,6 +13,7 @@
 #include <thread>
 #include <mutex>
 #include <time.h>
+#include <sys/time.h>
 
 void calcDirectionWindowed();
 float calcDirection(cv::Mat buff);
