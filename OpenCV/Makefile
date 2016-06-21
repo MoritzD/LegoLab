@@ -1,2 +1,2 @@
 all:
-	g++ `pkg-config --cflags --libs opencv` main.cpp -o opencv
+	g++ main.cpp `pkg-config --cflags --libs opencv` -lpthread -std=c++11 -o opencv 
