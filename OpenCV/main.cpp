@@ -11,8 +11,9 @@
 #define MAX_POINT_DISTANCE_X 80 //maximum distance between two neighbouring points on x-axis
 #define UARTDEV "/dev/ttyAMA0"	// The device file for the UART connection to the Hano board.
 
-//#define debug
-//#define output
+//#define DEBUG
+#define OUTPUT
+//#define UART
 using namespace cv;
 
 
@@ -30,10 +31,12 @@ int main(){
         
     };
 */
+
+#ifdef UART
     int uart_handle(-1);
     uart_handle = init_uart();
     if(uart_handle==-1) return -1;
-
+#endif
 
 
     VideoCapture cap(VIDEO_DEVICE_NUM);
@@ -53,16 +56,18 @@ int main(){
     while(1){
         new_dir = calcDirection(frameBuffer, cap);
         cur_dir = (1-alpha) * cur_dir + alpha * new_dir;
-#ifdef output
+#ifdef OUTPUT
 	std::cout << "------------------------------------------------\n";
         std::cout << "new direction is: " << new_dir << '\n';
         std::cout << "driving direction is " << cur_dir << '\n';
 #endif
         data = map_angle(cur_dir, STEERING_LEVEL_SIZE, STEERING_LEVEL_SIZE_PROGRESSION);
-#ifdef output
+#ifdef OUTPUT
         std::cout << "Uart data is: " << (int) data << std::endl;
 #endif
-        uart_write(uart_handle, data);
+#ifdef UART  
+      uart_write(uart_handle, data);
+#endif
     }
     return 0;
 }
@@ -186,7 +191,7 @@ float calcDirection(Mat buff, VideoCapture cap){
         }
         if(max_value>MIN_GRADIENT_THRESHOLD) max_points[point_count++] = cvPoint(x_max, j-1); //point is not added if gradient to small
     }
-#ifdef output
+#ifdef OUTPUT
     std::cout <<"Vector size: " << point_count << '\n'; //TODO just for debugging
 #endif
 	if( point_count < 2){
@@ -217,7 +222,7 @@ float calcDirection(Mat buff, VideoCapture cap){
     direction = direction * 180 / M_PI;
 
     // Just for debugging
-#ifdef debug
+#ifdef DEBUG
     Mat debug;
     cvtColor(buff, debug, CV_GRAY2RGB, 3);
     for(unsigned int i = 0; i<max_points.size(); i++){

@@ -2,7 +2,7 @@
 
 
 
-#define VIDEO_DEVICE_NUM 1 //number of video device
+#define VIDEO_DEVICE_NUM 0 //number of video device
 #define ALPHA 0.4 //0.6   //influence of new direction
 #define STEERING_LEVEL_SIZE 5.0 //size of a discrete steering level
 #define STEERING_LEVEL_SIZE_PROGRESSION 0//.5 //dif size between progressing steering levels
@@ -10,12 +10,12 @@
 #define MAX_POINT_DISTANCE_Y 50 //maximum distance between two neighbouring points on y-axis
 #define MAX_POINT_DISTANCE_X 80 //maximum distance between two neighbouring points on x-axis
 #define UARTDEV "/dev/ttyAMA0"	// The device file for the UART connection to the Hano board.
-#define THREAD_NUMBER 8
+#define THREAD_NUMBER 4
 
 
 
 //#define DEBUG
-#define output
+#define OUTPUT
 //#define UART
 
 using namespace cv;
@@ -69,7 +69,7 @@ int main(){
         cur_dir = current_Direction;
         cur_dir_mutex.unlock();
         data = map_angle(cur_dir, STEERING_LEVEL_SIZE, STEERING_LEVEL_SIZE_PROGRESSION);
-#ifdef output
+#ifdef OUTPUT
         std::cout << "------------------------------------------------\n";
         std::cout << "driving direction is " << cur_dir << '\n';
         std::cout << "Uart data is: " << (int) data << std::endl;
@@ -205,7 +205,7 @@ float calcDirection(Mat buff){
         }
         if(max_value>MIN_GRADIENT_THRESHOLD) max_points[point_count++] = cvPoint(x_max, j-1); //point is not added if gradient to small
     }
-#ifdef output
+#ifdef OUTPUT
     std::cout <<"Vector size: " << point_count << '\n'; //TODO just for debugging
 #endif
 	if( point_count < 2){
@@ -316,13 +316,13 @@ void threadMainLoop(Mat buff){
 		  gettimeofday(&frame_tp, NULL);
         cap_mutex.unlock();
 	
-#ifdef output	
+#ifdef OUTPUT	
 		  std::clock_t c_start = std::clock(); 		  
 #endif
 
         new_dir = calcDirection(buff);
 
-#ifdef output
+#ifdef OUTPUT
 		  std::clock_t c_stop = std::clock();
 		  std::cout << "Thread calculated frame for " << 1000.0*(c_stop-c_start) /CLOCKS_PER_SEC << " ms\n";
 #endif
@@ -334,7 +334,7 @@ void threadMainLoop(Mat buff){
 				tp_last_frame = frame_tp;
 				cond_var.notify_all();
 		  }else{
-#ifdef output
+#ifdef OUTPUT
 				std::cout << "                                                  Frame got deleted\n";
 #endif
 		  }
