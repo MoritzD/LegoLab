@@ -3,18 +3,18 @@
 
 
 #define VIDEO_DEVICE_NUM 1 //number of video device
-#define ALPHA 0.4 //0.6   //influence of new direction
+#define ALPHA 0.8 //0.6   //influence of new direction
 #define STEERING_LEVEL_SIZE 5.0 //size of a discrete steering level
 #define STEERING_LEVEL_SIZE_PROGRESSION 0//.5 //dif size between progressing steering levels
 #define MIN_GRADIENT_THRESHOLD 25 //points with lower gradient value are not considert to be a edge of the line
-#define MAX_POINT_DISTANCE_Y 50 //maximum distance between two neighbouring points on y-axis
-#define MAX_POINT_DISTANCE_X 80 //maximum distance between two neighbouring points on x-axis
-#define UARTDEV "/dev/ttyAMA0"	// The device file for the UART connection to the Hano board.
-#define THREAD_NUMBER 8
+#define MAX_POINT_DISTANCE_Y 30 //maximum distance between two neighbouring points on y-axis
+#define MAX_POINT_DISTANCE_X 60 //maximum distance between two neighbouring points on x-axis
+#define UARTDEV "/dev/ttyUSB0"	// The device file for the UART connection to the Hano board.
+#define THREAD_NUMBER 1
 
 
 
-//#define DEBUG
+#define DEBUG
 #define output
 //#define UART
 
@@ -180,6 +180,14 @@ void calcDirectionWindowed()
 float calcDirection(Mat buff){
 
 
+#ifdef DEBUG
+	 std::stringstream oss;
+	 oss << "Origin for " << std::this_thread::get_id();
+    namedWindow(oss.str(), WINDOW_AUTOSIZE);
+    imshow(oss.str(), buff);
+#endif
+
+
     //cap >> buff; //get frame
 //    GaussianBlur(buff, buff, Size2i(5,5),0,0, BORDER_DEFAULT); //apply gaussian filter
     filter2D(buff, buff, buff.depth(), LINE_DETECTION_MASK); //aply maks
@@ -237,7 +245,7 @@ float calcDirection(Mat buff){
 
     // Just for debugging
 #ifdef DEBUG
-    Mat debug;
+	 Mat debug;
     cvtColor(buff, debug, CV_GRAY2RGB, 3);
     for(unsigned int i = 0; i<max_points.size(); i++){
         circle(debug, max_points[i], 1, CV_RGB(255,255,0), 1, 8, 0);
