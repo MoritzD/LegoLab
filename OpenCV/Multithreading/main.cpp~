@@ -2,7 +2,22 @@
 
 
 
+<<<<<<< HEAD
+#define VIDEO_DEVICE_NUM 1 //number of video device
+#define ALPHA 0.8 //0.6   //influence of new direction
+#define STEERING_LEVEL_SIZE 5.0 //size of a discrete steering level
+#define STEERING_LEVEL_SIZE_PROGRESSION 0//.5 //dif size between progressing steering levels
+#define MIN_GRADIENT_THRESHOLD 25 //points with lower gradient value are not considert to be a edge of the line
+#define MAX_POINT_DISTANCE_Y 30 //maximum distance between two neighbouring points on y-axis
+#define MAX_POINT_DISTANCE_X 60 //maximum distance between two neighbouring points on x-axis
+#define UARTDEV "/dev/ttyUSB0"	// The device file for the UART connection to the Hano board.
+#define THREAD_NUMBER 1
 
+
+
+#define DEBUG
+#define output
+=======
 #define VIDEO_DEVICE_NUM 0 //number of video device
 #define ALPHA 0.4 //0.6   //influence of new direction
 #define STEERING_LEVEL_SIZE 5.0 //size of a discrete steering level
@@ -17,6 +32,7 @@
 
 //#define DEBUG
 #define OUTPUT
+>>>>>>> ba3a14a9a5e9130c95078f4b97543beab8d99117
 //#define UART
 
 using namespace cv;

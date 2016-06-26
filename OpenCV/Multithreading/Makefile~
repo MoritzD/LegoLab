@@ -1,0 +1,6 @@
+all:
+<<<<<<< HEAD
+	g++ main.cpp `pkg-config --cflags --libs opencv` -lpthread -std=c++11  -o opencv 
+=======
+	g++ main.cpp `pkg-config --cflags --libs opencv` -lpthread -std=c++11 -o opencv 
+>>>>>>> ba3a14a9a5e9130c95078f4b97543beab8d99117

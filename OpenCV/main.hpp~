@@ -10,11 +10,8 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui.hpp"
 #include <pthread.h>
-#include <thread>
-#include <mutex>
 #include <time.h>
 #include <sys/time.h>
-#include <condition_variable>
 
 
 void calcDirectionWindowed();
