@@ -1,8 +1,8 @@
 #include "main.hpp"
-#include <pthread.h>
 
 
-#define VIDEO_DEVICE_NUM 0 //number of video device
+
+#define VIDEO_DEVICE_NUM 1 //number of video device
 #define ALPHA 0.9 //0.6   //influence of new direction
 #define STEERING_LEVEL_SIZE 5.0 //size of a discrete steering level
 #define STEERING_LEVEL_SIZE_PROGRESSION 0.5 //dif size between progressing steering levels
@@ -11,8 +11,8 @@
 #define MAX_POINT_DISTANCE_X 80 //maximum distance between two neighbouring points on x-axis
 #define UARTDEV "/dev/ttyAMA0"	// The device file for the UART connection to the Hano board.
 
-//#define debug
-//#define output
+#define debug
+#define output
 using namespace cv;
 
 
@@ -30,10 +30,11 @@ int main(){
         
     };
 */
+/*
     int uart_handle(-1);
     uart_handle = init_uart();
     if(uart_handle==-1) return -1;
-
+*/
 
 
     VideoCapture cap(VIDEO_DEVICE_NUM);
@@ -51,10 +52,13 @@ int main(){
 
 
     while(1){
+		  std::clock_t c_start = std::clock();
+	
+			
         new_dir = calcDirection(frameBuffer, cap);
         cur_dir = (1-alpha) * cur_dir + alpha * new_dir;
 #ifdef output
-	std::cout << "------------------------------------------------\n";
+		  std::cout << "------------------------------------------------\n";
         std::cout << "new direction is: " << new_dir << '\n';
         std::cout << "driving direction is " << cur_dir << '\n';
 #endif
@@ -62,7 +66,10 @@ int main(){
 #ifdef output
         std::cout << "Uart data is: " << (int) data << std::endl;
 #endif
-        uart_write(uart_handle, data);
+        //uart_write(uart_handle, data);
+
+		  std::clock_t c_stop = std::clock();
+		  std::cout << "Time per Frame: " << 1000.0*(c_stop-c_start) /CLOCKS_PER_SEC << std::endl;
     }
     return 0;
 }
