@@ -1,0 +1,198 @@
+
+
+\begin{frame}[plain]{Optimization Strategies}{Troubleshooting}
+\large
+\pause
+	First tests: Not so good...\\
+	\pause
+	Why does the car lose the line?\\
+	\pause
+	Use laptop instead of Raspberry Pi: 
+		\pause
+		\begin{itemize}
+			\large
+			\item Car worked perfectly fine
+			\pause
+			\item Reason: 
+			\pause
+			\begin{itemize}
+				\large
+				\item Computation power
+				\pause
+				\item $\approx$ 4ms per frame \pause (Pi: $\approx$170ms)
+				\pause
+				\item Camera: 15 FPS \pause $\Rightarrow$ new frame every 66ms
+			\end{itemize}	
+			\pause
+			\item BUT: Algorithm concept works!
+			
+		\end{itemize}		 
+\end{frame}
+ 
+  
+\begin{frame}[plain]{Optimization Strategies}{Guideline}
+\large
+	Main Problems:
+	\pause
+	\begin{itemize}
+	\large
+		\item Runtime
+		\begin{itemize}
+		\large
+			\item Reaction time $\Leftrightarrow$ feasible speed
+		\end{itemize}
+		\pause
+		\item Not all frames of the camera are processed
+	\end{itemize}
+	\pause
+	\vspace{1.5cm}
+	Main Improvements:
+	\pause
+	\begin{itemize}
+	\large
+		\item Improve runtime
+		\begin{itemize}
+		\large
+			\item Improve reaction time $\Leftrightarrow$ feasible speed
+		\end{itemize}
+		\pause
+		\item Process every frame
+		\begin{itemize}
+		\large
+			\item Improve feasible speed
+		\end{itemize}
+	\end{itemize}
+	
+\end{frame}
+
+\begin{frame}[plain]{Optimization Strategies}{Optimize Runtime}
+\large
+\pause
+Disabled Gaussian Filter
+\pause
+\begin{itemize}
+	\large
+	\item Saves a lot of computation time
+	\pause
+	\item Replaced it by simple hardware trick
+	\pause
+	\begin{itemize}
+		\large
+		\item changed focus of camera \pause $\Rightarrow$ image gets blurred
+	\end{itemize}
+\end{itemize}
+\pause
+Restrict search range 
+\pause
+\begin{itemize}
+	\large
+	\item Before: search total line for largest Gradient
+	\pause
+	\item Now: only search at x-Position of last line $\pm$80 pixels
+\end{itemize}
+\pause
+Only consider Gradients >25
+\pause
+\begin{itemize}
+	\large
+	\item If not found in search range: ignore line
+\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Optimization Strategies}{exploit concurrency}
+\large
+\pause
+	Optimized runtime: $\approx$100-110ms per frame
+	\pause
+	\begin{itemize}
+		\large
+		\item Pretty good, but still every second frame lost
+		\pause
+		\item We are only using one core\pause, but Raspberry Pi has 4!
+	\end{itemize}
+	\pause
+	\vspace{.5cm}
+	Recompile OpenCV WITH\_OPENMP
+	\pause
+	\begin{itemize}
+		\large
+		\item Uses OpenMP to parallelize OpenCV calls
+		\pause
+		\item Runtime: $\approx$80ms 
+		\pause
+		\item still >66ms \pause $\Rightarrow$ Not good enough
+	\end{itemize}
+	
+\end{frame}
+
+\begin{frame}[plain]{Optimization Strategies}{exploit concurrency}
+\pause
+%\large
+If we can't catch all frames with one thread why not use two?
+\vspace{.5cm}
+\begin{itemize}
+	\pause
+	\item Main thread starts two worker threads and sleeps
+	\pause
+	\item Worker thread grabs a image from the camera (synchronized)
+	\pause
+	\item Worker processes the image 
+	\pause
+	\item Worker checks whether a later frame had already finished
+	\pause
+	\item Worker wakes Main thread and communicates the calculated direction
+	\pause
+	\item Main thread generates UART signal and sleeps again
+\pause
+\end{itemize}
+\vspace{.5cm}
+This does not affect Reaction time, but increases performance
+\end{frame}
+
+\begin{frame}[plain]{Optimization Strategies}{exploit concurrency}
+\pause
+	Our approach and the WITH\_OPENMP option don't work well together
+	\pause
+		\begin{itemize}
+			\item Runtime $\approx$120-130ms per frame (using 2 threads)
+			\pause
+			\item Probably to many threads started for the Pi
+		\end{itemize}
+		\pause
+	Without using multithreading in OpenCV
+		\begin{itemize}
+		\pause
+			\item Runtime $\approx$100-110ms per frame (using 2 threads)
+			\pause
+			\item Threads grab frames alternating
+			\pause
+			\item Every frame gets processed
+		\end{itemize}
+		
+\end{frame}
+
+\begin{frame}[plain]{Optimization Strategies}{summary}
+	\large
+	\pause
+	Optimizations:
+	\begin{itemize}
+		\large
+		\pause
+		\item Reduce runtime per frame
+		\pause
+		\item Use multiple threads
+		\pause
+		\item Ensure every frame of the camera is used
+	\end{itemize}
+	\pause
+	\vspace{1cm}
+	Result: 
+	\begin{itemize}
+	\pause
+		\item Grate performance is achieved
+		\pause
+		\item Car follows the line
+		\pause
+		\item Increase Speed of the car
+	\end{itemize}			
+\end{frame}

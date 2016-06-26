@@ -118,31 +118,35 @@
 
 \end{frame}
 
-
+\iffalse
 \input{moritz.tex}
+
 }}
 {
 \addtobeamertemplate{navigation symbols}{}{%
-%\addtobeamertemplate{footline}{%
     \usebeamerfont{footline}%
     \usebeamercolor[fg]{title}%
    \small\insertframenumber%/\inserttotalframenumber
    \hspace{6,28cm}%
 }
 
-%\includepdf[pages=-, pagecommand={\thispagestyle{plain}}]{berkay.pdf}
 \includepdf[pages=-,pagecommand={\setcounter{framenumber}{\value{page}}\thispagestyle{plain}}]{berkay.pdf}
 
 
 {\1
 \input{abdallah.tex}
+\fi
 \input{heiko.tex}
+\input{optimization.tex}
 }
 }
 
 {\1
 \begin{frame}[plain]
-	\huge Thank you for your attention
+\center
+	\huge Thank you for your attention\\
+	\vspace{1.5cm}
+	\large Next up: \textbf{Live Demo}
 \end{frame}
 }
 
