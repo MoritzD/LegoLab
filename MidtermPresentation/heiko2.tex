@@ -1,5 +1,4 @@
 \begin{frame}[plain]{Steering Control}
-	% this is a comment
 	\large 
 	\textbf{Approach}
 	\begin{itemize}
@@ -23,58 +22,77 @@
 \end{frame}
 
 \begin{frame}[plain]{Steering Control}
-	\large 
-	\textbf{Algorithm}	
-	\begin{enumerate}
-		\item Get frame of camera (15 fps)
-		\pause
-		\item Blur Image
-				\begin{itemize}
-					\item Could be done by Gaussian-Filter
-					\item Do it by hardware (faster)
-				\end{itemize}
-		\pause
-		\item Convert Image from RGB to gray
-		\pause
-		\item Approximate gradient
-				\begin{itemize}
-					\item Only horizontal change
-					\item Apply Mask
-							$
-							M=
-							\begin{bmatrix}
-							-1 & 0 & 1 \\
-							-2 & 0 & 2 \\
-							-1 & 0 & 1
-							\end{bmatrix}
-							$
-				\end{itemize}
-		\pause
-		\item Find maximum value each row
-				\begin{itemize}
-					\item Store points
-					\item Threshold for max x,y-distance
-					\item Threshold for min gradient value
-				\end{itemize}
-	\end{enumerate}
+	\begin{columns}[T]
+		\begin{column}[T]{7cm}
+			\large 
+			\textbf{Algorithm}	
+			\begin{enumerate}
+				\visible<1->{\item Get frame of camera (15 fps)}
+				\visible<2->{\item Blur Image
+								\begin{itemize}
+									\item Could be done by Gaussian-Filter
+									\item Do it by hardware (faster)
+								\end{itemize}
+							}
+				\visible<3->{\item Convert Image from RGB to gray}
+				\visible<4->{\item Approximate gradient
+								\begin{itemize}
+									\item Only horizontal change
+									\item Apply Mask
+											$
+											M=
+											\begin{bmatrix}
+											-1 & 0 & 1 \\
+											-2 & 0 & 2 \\
+											-1 & 0 & 1
+											\end{bmatrix}
+											$
+								\end{itemize}
+							}
+				\visible<5->{\item Find maximum value each row
+								\begin{itemize}
+									\item Store points
+									\item Threshold for max x,y-distance
+									\item Threshold for min gradient value
+								\end{itemize}
+							}
+			\end{enumerate}
+		\end{column}
+		\begin{column}[T]{5cm}
+			\vspace{1cm}
+			\includegraphics<1-2>[width=\textwidth]{Heikographics/line2}
+			%\includegraphics<2>[width=\textwidth]{Heikographics/line2}
+			\includegraphics<3>[width=\textwidth]{Heikographics/line3}
+			\includegraphics<4>[width=\textwidth]{Heikographics/line4}
+			\includegraphics<5>[width=\textwidth]{Heikographics/line5}
+		\end{column}
+	\end{columns}
 \end{frame}	
 
 \begin{frame}[plain]{Steering Control}
+	\begin{columns}[T]
+		\begin{column}[T]{7cm}
+			\large
+			\textbf{Algorithm}
+			\begin{enumerate}
+				\setcounter{enumi}{5}
+				\visible<2->{\item Fit line on points (squared distance weighting)}
+				\visible<3->{\item Calculate steering angle}
+				\visible<4->{\item Add angle:\\
+				 			$SteeringAngle = \alpha * NewAngle + (1-\alpha) * LastAngle$}
+				\visible<5->{\item Map angle to servo levels (15 settings)}
+				\visible<6->{\item Send via Uart}
+			\end{enumerate}
+		\end{column}
+		\begin{column}[T]{5cm}
+			\vspace{1cm}
+			\includegraphics<1->[width=\textwidth]{Heikographics/line6}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[plain]{Steering Control}
 	\large
-	\textbf{Algorithm}
-	\begin{enumerate}
-		\setcounter{enumi}{5}
-		\item Fit line on points (squared distance weighting)
-		\pause
-		\item Calculate steering angle
-		\pause
-		\item Add angle: $SteeringAngle = \alpha * NewAngle + (1-\alpha) * LastAngle$
-		\pause
-		\item Map angle to servo levels (15 settings)
-		\pause
-		\item Send via Uart
-	\end{enumerate}
-	\pause
 	\textbf{Parameters}
 	\begin{itemize}
 		\item Weight of new angle ($\alpha$)
