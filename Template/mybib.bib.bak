@@ -1,0 +1,169 @@
+% Encoding: UTF-8
+
+
+@Article{ChenChanGuoEtAl2013,
+  Title                    = {{{A} review of lower extremity assistive robotic exoskeletons in rehabilitation therapy}},
+  Author                   = {Chen, G. and Chan, C. K. and Guo, Z. and Yu, H.},
+  Journal                  = {Crit Rev Biomed Eng},
+  Year                     = {2013},
+  Number                   = {4-5},
+  Pages                    = {343--363},
+  Volume                   = {41}
+}
+
+@InProceedings{cooperative2009,
+  Title                    = {Cooperative walk control of paraplegia patient and assistive system},
+  Author                   = {Hasegawa, Yasuhisa and Jang, Junho and Sankai, Yoshiyuki},
+  Booktitle                = {Intelligent robots and systems, 2009. IROS 2009. IEEE/RSJ international conference on},
+  Year                     = {2009},
+  Organization             = {IEEE},
+  Pages                    = {4481--4486}
+}
+
+@InProceedings{cooperative2014,
+  Title                    = {Finger-mounted walk controller of powered exoskeleton for paraplegic patient's walk},
+  Author                   = {Hasegawa, Yasuhisa and Nakayama, Keisuke},
+  Booktitle                = {World Automation Congress (WAC), 2014},
+  Year                     = {2014},
+  Organization             = {IEEE},
+  Pages                    = {400--405}
+}
+
+@InProceedings{eeg2013,
+  Title                    = {High accuracy decoding of user intentions using EEG to control a lower-body exoskeleton},
+  Author                   = {Kilicarslan, Atilla and Prasad, Santasriya and Grossman, Robert G and Contreras-Vidal, Jose L},
+  Booktitle                = {Engineering in medicine and biology society (EMBC), 2013 35th annual international conference of the IEEE},
+  Year                     = {2013},
+  Organization             = {IEEE},
+  Pages                    = {5606--5609}
+}
+
+@Misc{ekso,
+  HowPublished             = {\url{http://intl.eksobionics.com/#home}},
+  URL                      = {\url{http://intl.eksobionics.com/#home}}
+}
+
+@InProceedings{emg2009,
+  Title                    = {EMG-based control for lower-limb power-assist exoskeletons},
+  Author                   = {Kiguchi, Kazuo and Imada, Yasunobu},
+  Booktitle                = {Robotic Intelligence in Informationally Structured Space, 2009. RIISS'09. IEEE Workshop on},
+  Year                     = {2009},
+  Organization             = {IEEE},
+  Pages                    = {19--24}
+}
+
+@Article{GuizzoGoldstein2005,
+  Title                    = {{{T}he rise of the body bots [robotic exoskeletons]}},
+  Author                   = {Guizzo, Erico and Goldstein, Harry},
+  Journal                  = {Spectrum, IEEE},
+  Year                     = {2005},
+  Number                   = {10},
+  Pages                    = {50--56},
+  Volume                   = {42},
+  Publisher                = {IEEE}
+}
+
+@Article{Gwynne2013,
+  Title                    = {{{T}echnology: {M}obility machines}},
+  Author                   = {Gwynne, P. },
+  Journal                  = {Nature},
+  Year                     = {2013},
+  Month                    = {Nov},
+  Number                   = {7475},
+  Pages                    = {S16--17},
+  Volume                   = {503}
+}
+
+@Misc{hal,
+  HowPublished             = {\url{http://www.cyberdyne.jp/english/products/LowerLimb_medical.html}},
+  URL                      = {\url{http://www.cyberdyne.jp/english/products/LowerLimb_medical.html}}
+}
+
+@InProceedings{he2007,
+  Title                    = {A study on emg-based control of exoskeleton robots for human lower-limb motion assist},
+  Author                   = {He, H and Kiguchi, K},
+  Booktitle                = {Information Technology Applications in Biomedicine, 2007. ITAB 2007. 6th International Special Topic Conference on},
+  Year                     = {2007},
+  Organization             = {IEEE},
+  Pages                    = {292--295}
+}
+
+@Misc{indego,
+  HowPublished             = {\url{http://www.indego.com/indego/en/home}},
+  URL                      = {\url{http://www.indego.com/indego/en/home}}
+}
+
+@InProceedings{kawamoto2014,
+  Title                    = {Development of an assist controller with robot suit HAL for hemiplegic patients using motion data on the unaffected side},
+  Author                   = {Kawamoto, Hiroaki and Kandone, Hideki and Sakurai, Takayasu and Ariyasu, Ryohei and Ueno, Yukiko and Eguchi, Kiyoshi and Sankai, Yoshiyuki},
+  Booktitle                = {Engineering in Medicine and Biology Society (EMBC), 2014 36th Annual International Conference of the IEEE},
+  Year                     = {2014},
+  Organization             = {IEEE},
+  Pages                    = {3077--3080}
+}
+
+@InProceedings{neurorex,
+  Title                    = {NeuroRex: A clinical neural interface roadmap for EEG-based brain machine interfaces to a lower body robotic exoskeleton},
+  Author                   = {Contreras-Vidal, Jose L and Grossman, Robert G},
+  Booktitle                = {Engineering in medicine and biology society (EMBC), 2013 35th annual international conference of the IEEE},
+  Year                     = {2013},
+  Organization             = {IEEE},
+  Pages                    = {1579--1582}
+}
+
+@Article{nexgen,
+  Title                    = {The next generation of exoskeletons: Lighter, cheaper devices are in the works},
+  Author                   = {Mertz, Leslie},
+  Journal                  = {Pulse, IEEE},
+  Year                     = {2012},
+  Number                   = {4},
+  Pages                    = {56--61},
+  Volume                   = {3},
+  Publisher                = {IEEE}
+}
+
+@Article{quintero2012,
+  Title                    = {A method for the autonomous control of lower limb exoskeletons for persons with paraplegia},
+  Author                   = {Quintero, Hugo A and Farris, Ryan J and Goldfarb, Michael},
+  Journal                  = {Journal of medical devices},
+  Year                     = {2012},
+  Number                   = {4},
+  Pages                    = {041003},
+  Volume                   = {6},
+  Publisher                = {American Society of Mechanical Engineers}
+}
+
+@InCollection{remote,
+  Title                    = {A Model-Driven Engineering Approach to the Evaluation of a Remote Controller of a Movement Assistant System},
+  Author                   = {Derezi{\'n}ska, Anna and Redosz, Karol},
+  Booktitle                = {Man--Machine Interactions 4},
+  Publisher                = {Springer},
+  Year                     = {2016},
+  Pages                    = {93--102}
+}
+
+@Misc{rex,
+  HowPublished             = {\url{http://www.rexbionics.com/}},
+  URL                      = {\url{http://www.rexbionics.com/}}
+}
+
+@InProceedings{sakurai2009,
+  Title                    = {Development of motion instruction system with interactive robot suit HAL},
+  Author                   = {Sakurai, Takeru and Sankai, Yoshiyuki},
+  Booktitle                = {Robotics and Biomimetics (ROBIO), 2009 IEEE International Conference on},
+  Year                     = {2009},
+  Organization             = {IEEE},
+  Pages                    = {1141--1147}
+}
+
+@Article{Zeilig2012,
+  Title                    = {Safety and tolerance of the ReWalk™ exoskeleton suit for ambulation by people with complete spinal cord injury: A pilot study},
+  Author                   = {Zeilig, Gabi and Weingarden, Harold and Zwecker, Manuel and Dudkiewicz, Israel and Bloch, Ayala and Esquenazi, Alberto},
+  Journal                  = {The journal of spinal cord medicine},
+  Year                     = {2012},
+  Number                   = {2},
+  Pages                    = {96--101},
+  Volume                   = {35},
+  Publisher                = {Maney Publishing}
+}
+

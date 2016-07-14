@@ -1,0 +1,13 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Hardware Parts}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{DEO-Nano}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Raspberry Pi}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Actuators}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Sensors}{section.2}% 6
+\BOOKMARK [1][-]{section.3}{Cabling}{}% 7
+\BOOKMARK [1][-]{section.4}{Communication}{}% 8
+\BOOKMARK [1][-]{section.5}{Collision Avoidance}{}% 9
+\BOOKMARK [1][-]{section.6}{Image processing for line detection and following}{}% 10
+\BOOKMARK [2][-]{subsection.6.1}{Code}{section.6}% 11
+\BOOKMARK [2][-]{subsection.6.2}{Optimization}{section.6}% 12
+\BOOKMARK [1][-]{section.7}{Conclusion}{}% 13
