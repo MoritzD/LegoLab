@@ -32,6 +32,8 @@
 \usepackage{helvet}
 \usepackage{array}
 
+\usepackage{media9} %for video playback (only working with acrobat
+
 \usepackage{pdfpages}
 
 \usepackage{listings}
@@ -61,9 +63,9 @@
       \textbf{Lego Car}
 }
 
-\subtitle[Midterm Presentation]
+\subtitle[Final Presentation]
 {
-      \textbf{Midterm Presentation}
+      \textbf{Final Presentation}
 }
 
 \author[Autor]
@@ -78,7 +80,7 @@
   %there must be an empty line above this line - otherwise some unwanted space is added between the university and the country (I do not know why;( )
 %}
 
-\date{30.5.2016}
+\date{27.6.2016}
 
 
 %-------------------------------------------------------
@@ -110,16 +112,16 @@
 \begin{frame}[plain]{\huge Agenda}
 	\begin{itemize}
 	\LARGE
-		\item Wiring
-		\item Nano Board
-		\item Raspberry Pi
-		\item OpenCV
+		\item Hardware \& Wiring
+		\item Adaptive Cruse Control
+		\item Steering Control
+		\item Optimizations
 	\end{itemize}
 
 \end{frame}
 
-\iffalse
-\input{moritz.tex}
+%\iffalse
+%\input{moritz.tex}
 
 }}
 {
@@ -130,13 +132,14 @@
    \hspace{6,28cm}%
 }
 
-\includepdf[pages=-,pagecommand={\setcounter{framenumber}{\value{page}}\thispagestyle{plain}}]{berkay.pdf}
+\includepdf[pages=-,pagecommand={\setcounter{framenumber}{\value{page}}\thispagestyle{plain}}]{berkay_endterm.pdf}
 
 
 {\1
+%\fi
 \input{abdallah.tex}
-\fi
-\input{heiko.tex}
+
+\input{heiko2.tex}
 \input{optimization.tex}
 }
 }
