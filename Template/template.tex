@@ -67,10 +67,10 @@ The hardware components used are two controllers, the DEO-Nano and the Raspberry
 The DE0-Nano board is a compact-sized FPGA based development platform manufactured by terasIC. Its heart is a Cyclone IV FPGA from Altera. Furthermore it features on board memory, LEDs, Buttons, and most importantly three GPIO headers. On this FPGA we flashed the provided Nios-II image. This is an image of an adaptable processor allowing for custom specializations such as multiple hardware UART handlers. Now it is possible to wright code for this processor in C using the hardware you desire, without any trade off. We are using four UART units to connect to three ultrasonic sensors as well as to the Raspberry Pi. Furthermore we use two PWM modules with each two channels allowing us to generate PWM signals at four pins. Those are used to control the drive motor and the steering servo.
 \subsection{Raspberry Pi}
 For this project the newly released Raspberry Pi 3 is used. Raspberry Pi is a small-sized one board computer. In this work it is used to connect the camera with the Nano-board and to run the line following code.\\
-First, the computer is connected to the Raspberry Pi using Secure Schell (SSH) and the Raspbian Operating System is installed. Then the camera is connected using one of the USB ports and OpenCV is installed to run the line following code. Finally uart communication is enabled to connect the Raspberry Pi with the Nano-board. In Raspberry Pi 3 you need to disable Bluetooth in order for uart communication to work. To disable onboard Pi3 Bluetooth and restore uart over GPIOs 14 and 15, modify the file "/boot/config.txt":
+First, the micro SD-card for the Pi is prepared with the Raspbian Operating System installed on it. Then the Pi is boots the Raspbian and the computer is connected to the Raspberry Pi using Secure Schell (SSH) either via the Ethernet port, or using the build in Wi-Fi of the Pi 3 and the LRZ Wi-Fi network. Then the camera is connected using one of the USB ports and OpenCV is installed to run the line following code. Finally UART communication is enabled to connect the Raspberry Pi with the Nano-board. In Raspberry Pi 3 you need to disable Bluetooth in order for UART communication to work. To disable onboard Pi3 Bluetooth and restore UART over GPIOs 14 and 15, modify the file "/boot/config.txt":
 \begin{itemize}
 \item {sudo nano /boot/config.txt}
-\item {Add this to the end of the file "dtoverlay=pi3-disable-bt"}
+\item {Add to the end of the file: \\"dtoverlay=pi3-disable-bt"}
 \end{itemize}
 \subsection{Actuators}
 \begin{itemize}
@@ -121,11 +121,12 @@ In real cars, a long range radar sensor is used to detect the cars, here we use 
 
 The speed of the car is set according to the aforementioned algorithm, where the current speed is the duty cycle that is assigned to the speed motors.
 \section{Image processing for line detection and following}
+The task of the whole project was to build a Lego Car that can autonomous follow a line on the ground. For this purpose we are using an ordinary web cam on the front of the car giving us an image of the ground up to approximately 20 cm in front of the car. We developed an algorithm that detects the line in the image and calculates how the car needs to steer in order to stay on that line. The calculation is entirely done on the Raspberry Pi using the image processing framework OpenCV. The following sections explain how the image processing works and how we optimized it for the Raspberry Pi.
 \subsection{Code}
 \subsection{Optimization}
 
 \section{Conclusion}
-To conclude, the car followed a closed track without getting out of line in both directions. The maximum set speed was about 85\% of the maximum possible speed. If the camera had had a wider view, the full motor speed could had been reached.
+To conclude, the car followed a closed track without getting out of line in both directions. The maximum set speed was about 85\% of the maximum possible speed. With a few modifications on the camera, e.g. a higher frame rate of 30 FPS, or a wider viewing angle, or a higher computation power on the Raspberry Pi, the full motor speed could had been reached.
 
 \section*{Acknowledgments}
 
