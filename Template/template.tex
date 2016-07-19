@@ -17,6 +17,7 @@
 
 
 
+
 \ifpdf 
     \usepackage[pdftex]{graphicx}   % to include graphics
     \pdfcompresslevel=9 
@@ -37,10 +38,7 @@
         linkcolor=blue, citecolor=blue]{hyperref}
 
 \fi 
-
 \usepackage{tikz}
-\usepackage{pgf-umlsd}
-\usepgflibrary{arrows} % for pgf-umlsd
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -148,7 +146,8 @@ With this technique the worker threads alternately grab the images provided from
 \begin{figure}
 \centering
 \begin{tikzpicture}
-    \draw (-3,0) -- (-3,-11) (-1,-1) -- (-1,-4) (1,-3) -- (1,-6) (3,0) -- (3,-11);
+    \draw[line width=1mm, color = blue] (-3,0) -- (-3,-11) (3,0) -- (3,-11);
+    \draw[line width=1mm, color = red] (-1,-1) -- (-1,-4) (1,-3) -- (1,-6);
     \node at (-3,.3) {Main};
    % \node at (-3,-3) {Sleeping};
     \node at (-1,.3) {Worker1};
@@ -158,18 +157,27 @@ With this technique the worker threads alternately grab the images provided from
   %  \draw[->] (-3,-2) -- node[midway,above] {create()} (1,-2);
    % \draw[->] (-1,-3) -- node[midway,above] {GetImage()} (3,-3);
    % \draw[->] (1,-4) -- node[midway,above] {GetImage()} (3,-4);
-    \draw[<-] (-1,-1) -- node[midway,above] {Image} (3,-1);
+    \draw[<-,tips=proper,line width=1mm] (-1,-1) -- (3,-1);
+    \node at (2,-0.7) {Image};
    % \node at (-1,-6) {Processing};
-    \draw (-1,-5) -- (-1,-8) (-1,-9) -- (-1,-11) (1,-7) -- (1,-10);
-    \draw[<-] (1,-3) -- node[midway,above] {Image} (3,-3);
-    \draw[<-] (-3,-4) -- node[midway,above] {Angle} (-1,-4);
-    \draw[<-] (-3,-6) -- node[midway,above] {Angle} (1,-6);
+    \draw[line width=1mm, color = red] (-1,-5) -- (-1,-8) (-1,-9) -- (-1,-11) (1,-7) -- (1,-10);
+    \draw[<-,tips=proper,line width=1mm] (1,-3) --(3,-3);
+    \node at (2,-2.7) {Image};
+    \draw[<-,tips=proper,line width=1mm] (-3,-4) -- (-1,-4);
+    \node at (-2,-3.7) {Angle};
+    \draw[<-,tips=proper,line width=1mm] (-3,-6) -- (1,-6);
+    \node at (-2,-5.7) {Angle};
     %\draw[->] (-1,-8.2) -- node[midway,above] {GetImage()} (3,-8.2);
-    \draw[<-] (-1,-5) -- node[midway,above] {Image} (3,-5);
-    \draw[<-] (1,-7) -- node[midway,above] {Image} (3,-7);
-    \draw[<-] (-3,-8) -- node[midway,above] {Angle} (-1,-8);
-    \draw[<-] (-1,-9) -- node[midway,above] {Image} (3,-9);
-    \draw[<-] (-3,-10) -- node[midway,above] {Angle} (1,-10);
+    \draw[<-,tips=proper,line width=1mm] (-1,-5) -- (3,-5);
+    \node at (2,-4.7) {Image};
+    \draw[<-,tips=proper,line width=1mm] (1,-7) -- (3,-7);
+    \node at (2,-6.7) {Image};
+    \draw[<-,tips=proper,line width=1mm] (-3,-8) -- (-1,-8);
+    \node at (-2,-7.7) {Angle};
+    \draw[<-,tips=proper,line width=1mm] (-1,-9) -- (3,-9);
+    \node at (2,-8.7) {Image};
+    \draw[<-,tips=proper,line width=1mm] (-3,-10) -- (1,-10);
+    \node at (-2,-9.7) {Angle};
     
 \end{tikzpicture}
 	
