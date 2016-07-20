@@ -1,1 +1,30 @@
 \subsection{Code}
+The source code that runs on the Raspberry Pi has two major subtasks to fullfill. The first one is to organise and utilize the output of the multiple threads that are used to do the image processing. The second one is to run the line detection algorithm on those threads. 
+\subsubsection{Organising the threads}
+This task is done by the mainthread of the program. The communication between the mainthread and the computing threads is done via a synchronized variable. This variable represents the global direction the car should currently steer to. When a computing thread gets done with analysing a frame it updates this number. Before that it checks that this variable was not updated by a thread with a newer frame. Thus preventing old information being relevant. This global direction is not just set to the thread direction. Rather it is calculated by this formula:\\
+$NewGlobalDir =$\\$ \alpha * ThreadDir + (1-\alpha) * OldGlobalDir$\\
+This is done to give the car more smooth driving and to counteract wrong direction caused by bad frames. The $\alpha$-value is parameter that can be adjusted depending on the circumstances of the operating system and environment.\\
+After a computing thread has written its data into this global variable it notifys the main thread. If the mainthread is not woken up it sleeps to prevent busy wait and sending data more often than necessary. When being called the mainthread takes this global direction and maps it 15 discrete steering angles. This is done because the steering servo only knows 15 settings. After doing so the mainthread sends the data via Uart connection to the Nano Board. This can be done by sending one byte because the values lie between zero and 14. When done with that the mainthread goes to sleep again.
+\subsubsection{Line detection algorithm}
+The algorithm is run on each thread separately to calculate the direction the car needs to take. A lot of steps are done using functions of the OpenCV library. This will be noted by writing:"(OpenCV)". To start of a thread grabs a frame of the camera (OpenCV). The frame needs to be blured to counteract noise on the picture. This is done via hardware. The picture from the camera uses RGB color coding. Because it is difficult to compute on three different channels the frame is being converted into the grey color scheme (OpenCV). After that the mask M is applied to the frame (OpenCV).\\
+$M =
+\begin{pmatrix}
+-1 & 0 & 1\\
+-2 & 0 & 2\\
+-1 & 0 & 1
+\end{pmatrix}
+$\\
+This should approximate the horizontal change of the picture. Because we assume the line is running vertically this should highlight the edges of it.\\
+The algorithm now looks for the biggest value in each row. This should correspond to the right edge of the line if the line is the biggest contrast on the picture. Also it checks if this value is above a certain threshold and if two points are to far apart. If that is the case those points are not used in further computation. These thresholds can be varied depending on the camera position, amount of noise ect. Because of that the number of found points can vary for each frame. A line is now fit on these points (OpenCV). The cars position is assumed to be at bottom center of the picture. With the line and this assumption the needed angle to stay on the line can be calculated.\\
+This angle is now used to update the global direction and the thread waits to grab a new frame.
+\subsubsection{Parameters}
+There are a several parameters in the source code that can be used to set the algorithm to fit in different environments.
+\begin{description}
+	\item [\small ALPHA] This corresponds to the influence of a newly calculated direction
+	\item [\small STEERING\_LEVEL\_SIZE] Range of on discrete steering angle
+	\item [\small STEERING\_LEVEL\_SIZE\_PROGRESSION] Used if angle mapping should not be linear
+	\item [\small MIN\_GRADIENT\_THRESHOLD] Minimum gradient value for a point to be used
+	\item [\small MAX\_POINT\_DISTANCE\_Y] Minimum y-distance for a new point to be used
+	\item [\small MAX\_POINT\_DISTANCE\_X] Minimum x-distance for a new point to be used
+	\item [\small THREAD\_NUMBER] Number of computing threads
+\end{description}
