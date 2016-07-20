@@ -23,14 +23,14 @@ using namespace cv;
 
 
 const Mat LINE_DETECTION_MASK = (Mat_<char>(3,3) << -1,0,1,-2,0,2,-1,0,1);
-const float alpha(ALPHA);    //influence of new direction
+const float alpha(ALPHA);    //Influence of new direction
 
-VideoCapture cap(VIDEO_DEVICE_NUM);
-std::mutex cap_mutex;
+VideoCapture cap(VIDEO_DEVICE_NUM); //Used to cature frame of camare
+std::mutex cap_mutex;	//Mutex to synchronize cap
 
-float current_Direction(0.0);
-struct timeval tp_last_frame;
-std::mutex cur_dir_mutex;
+float current_Direction(0.0);	//Direction that is used by mainthread
+struct timeval tp_last_frame;	//Used to check if frame is up to date
+std::mutex cur_dir_mutex;	//Mutex to synchronize current_Direction
 
 std::condition_variable cond_var;
 std::mutex cond_mutex;
@@ -38,47 +38,55 @@ std::mutex cond_mutex;
 
 
 int main(){
+		
+	gettimeofday(&tp_last_frame, NULL); //Init tp_last_frame
 
-	  gettimeofday(&tp_last_frame, NULL);
-    //calcDirectionWindowed();
-
+	//Init Uart connection
 #ifdef UART
     int uart_handle(-1);
     uart_handle = init_uart();
     if(uart_handle==-1) return -1;
 #endif
 
-
     if(!cap.isOpened()){
         std::cout << "Could not open video stream!\n";
         return -1;
     }
-    unsigned char data = 7; //7 is straight
-
+	 //Data that is send via Uart
+    unsigned char data = 7; //7 is steering straight
+		
+	 //Create and start threads used for framecomputation
     std::thread threads[THREAD_NUMBER];
     Mat thread_buffer[THREAD_NUMBER];
     for(int i = 0; i<THREAD_NUMBER; i++){
         threads[i] = std::thread(threadMainLoop, thread_buffer[i]);
     }
 
+	 //Buffer for direction
     float cur_dir(0.0);
 
+	 //Loop of main thread
     while(1){
-
-	
+		  //Get current Direction(steering angle)
         cur_dir_mutex.lock();
         cur_dir = current_Direction;
         cur_dir_mutex.unlock();
+
+		  //Map direction to discrete angles
         data = map_angle(cur_dir, STEERING_LEVEL_SIZE, STEERING_LEVEL_SIZE_PROGRESSION);
+
 #ifdef OUTPUT
         std::cout << "------------------------------------------------\n";
         std::cout << "driving direction is " << cur_dir << '\n';
         std::cout << "Uart data is: " << (int) data << std::endl;
 #endif
+
+		  //Send data via Uart
 #ifdef UART
         uart_write(uart_handle, data);
 #endif
 
+		  //Wait until new frame got calculated (preventing busy wait)
 		  std::unique_lock<std::mutex> lock(cond_mutex);
 		  cond_var.wait(lock);
 		  lock.unlock();
@@ -87,97 +95,7 @@ int main(){
     return 0;
 }
 
-void calcDirectionWindowed()
-{
-    VideoCapture cap(VIDEO_DEVICE_NUM);
-
-    if(!cap.isOpened()){
-        std::cout << "Could not open video stream!\n";
-        return;
-    }
-    Mat frame, image;
-    //Mat mask = (Mat_<char>(3,3) <<  0, -1, 0, -1, 5, -1, 0, -1, 0);
-    Mat mask = (Mat_<char>(3,3) << -1,0,1,-2,0,2,-1,0,1);
-
-    std::cout << "Mask = "<< std::endl << mask << std::endl;
-
-    namedWindow("Original", CV_WINDOW_AUTOSIZE);
-    namedWindow("Window", CV_WINDOW_AUTOSIZE);
-
-    while(1){
-        cap >> frame; //get frame
-        GaussianBlur(frame, image, Size2i(5,5),0,0, BORDER_DEFAULT); //apply gaussian filter
-        filter2D(image, image, frame.depth(), mask); //aply maks
-        cvtColor(image, image, CV_RGB2GRAY, 1); //reduce color to one channel
-
-        //calc max and min points for each row
-        std::vector<Point2i> max_points(image.rows-2);
-        std::vector<Point2i> min_points(image.rows-2);
-        char max_value = 0;
-        char min_value = CHAR_MAX;
-        char current_value = 0;
-        int x_min = 0;
-        int x_max = 0;
-        for(int j = 1; j<image.rows-1; j++){ //edges not interpolated
-            max_value = 0;
-            min_value = CHAR_MAX;
-            x_min = 0;
-            x_max = 0;
-            for(int i = 1; i < image.cols-1; i++){
-                current_value = image.ptr<uchar>(j)[i];
-                if(max_value < current_value){
-                    max_value = current_value;
-                    x_max = i;
-                }
-                if(min_value > current_value){
-                    min_value = current_value;
-                    x_min = i;
-                }
-            }
-            max_points[j-1] = cvPoint(x_max, j-1);
-            min_points[j-1] = cvPoint(x_min, j-1);
-        }
-
-        //calculate lines
-        Vec4f max_line;
-        Vec4f min_line;
-        fitLine(max_points, max_line, CV_DIST_L2, 0, 0.01, 0.01);
-        fitLine(min_points, min_line, CV_DIST_L2, 0, 0.01, 0.01);
-
-        cvtColor(image, image, CV_GRAY2RGB, 3); //three channels are needed to draw colored lines
-
-        //draw min- and max-lines on the image
-        Point2i max_point1 = cvPoint(max_line[2]- 200*max_line[0], max_line[3] - 200*max_line[1]);
-        Point2i max_point2 = cvPoint(max_line[2]+ 200*max_line[0], max_line[3] + 200*max_line[1]);
-        if(max_point1.y>max_point2.y){
-            Point2i buff = max_point2;
-            max_point2 = max_point1;
-            max_point1 = buff;
-        }
-
-        Point2i min_point1 = cvPoint(min_line[2]+ 200*min_line[0], min_line[3] + 200*min_line[1]);
-        Point2i min_point2 = cvPoint(min_line[2]- 200*min_line[0], min_line[3] - 200*min_line[1]);
-        Point2i car_position = cvPoint(image.cols/2, image.rows);
-
-        line(image, max_point1, max_point2, CV_RGB(255,0,0), 1,8,0); //max line (red)
-        line(image, min_point1, min_point2, CV_RGB(0,255,0), 1,8,0); //min line (yellow)
-        line(image, car_position, max_point1, CV_RGB(0,0,255), 2, 8, 0); //direction of car (blue)
-
-        imshow("Original", frame);
-        imshow("Window", image);
-
-
-        waitKey(10); //delay; necessary for winows to be updated
-
-        Vec2f car_direction(max_point1.x-car_position.x, max_point1.y-car_position.y);
-        normalize(car_direction, car_direction, 1, NORM_L1);
-        float direction = copysignf(std::acos(std::abs(car_direction[1])), car_direction[0]);
-        direction = direction * 180 / M_PI;
-        std::cout << "The calculated direction is: " << direction << '\n';
-
-    }
-}
-
+//Function to compute angle given a frame
 float calcDirection(Mat buff){
 
 
@@ -199,12 +117,15 @@ float calcDirection(Mat buff){
     char max_value = 0;
     char current_value = 0;
     int x_max, point_count = 0;
-    for(int j = buff.rows-2; j>1; j--){ //edges not interpolated
+    for(int j = buff.rows-2; j>1; j--){ //edges not interpolated by filter2D (--> buff.rows-2, ...)
+		  //Stops if y-Distance between points get to big
         if(point_count>0 && std::abs(max_points[point_count-1].y-j)>MAX_POINT_DISTANCE_Y) break;
         max_value = 0;
         x_max = 0;
+		  //Set startingpoint to search row
         int i = point_count>0 && max_points[point_count-1].x>MAX_POINT_DISTANCE_X ? max_points[point_count-1].x-MAX_POINT_DISTANCE_X : 1;
         for(; i < buff.cols-1; i++){
+				//Stops if x-Distance between points get to big
             if(point_count>0 && i-max_points[point_count-1].x>MAX_POINT_DISTANCE_X) break;
             current_value = buff.ptr<uchar>(j)[i];
             if(max_value < current_value){
@@ -214,9 +135,12 @@ float calcDirection(Mat buff){
         }
         if(max_value>MIN_GRADIENT_THRESHOLD) max_points[point_count++] = cvPoint(x_max, j-1); //point is not added if gradient to small
     }
+
+
 #ifdef OUTPUT
-    std::cout <<"Vector size: " << point_count << '\n'; //TODO just for debugging
+    std::cout <<"Vector size: " << point_count << '\n'; //Just for debugging
 #endif
+	//Make sure fitLine does not throw exception
 	if( point_count < 2){
 		point_count = 2;
 		max_points[0] = cvPoint(buff.cols/2, 0);
@@ -231,11 +155,11 @@ float calcDirection(Mat buff){
     //Point the car should drive to
     Point2i max_point = cvPoint(max_line[2] - 200*max_line[0], max_line[3] - 200*max_line[1]);
 
-    //make sure max_point is the further away one (line output does some weird shit)
+    //make sure max_point is the further away one (line output does some weird stuff...)
     Point2i max_pointb = cvPoint(max_line[2] + 200*max_line[0], max_line[3] + 200*max_line[1]);
     if(max_point.y>max_pointb.y) max_point = max_pointb;
 
-    //estimated position of car (TODO)
+    //estimated position of car
     Point2i car_position = cvPoint(buff.cols/2, buff.rows);
 
     //Calculate driving direction
@@ -280,6 +204,7 @@ int init_uart(){
     return handle;
 }
 
+//Writes one character via Uart
 int uart_write(int handle, unsigned char data){
     if(handle==-1){
         std::cout << "[ERROR] invalid handle\n";
@@ -293,7 +218,7 @@ int uart_write(int handle, unsigned char data){
     return 1;
 }
 
-//map angle to level understood by the nanoboard
+//Map angle to level understood by the nanoboard
 unsigned char map_angle(float dir, float level_range, float prog){
     unsigned char level(7); //straight
     float step(level_range);    //range of level (in degree)
@@ -314,11 +239,13 @@ unsigned char map_angle(float dir, float level_range, float prog){
     return level;
 }
 
+//Funktion run by threads
 void threadMainLoop(Mat buff){
     float new_dir(0.0);
 //	 int frame_time = time(NULL);
 
     while(1){
+		  //Get frame and systemtime of getting it
         cap_mutex.lock();
         cap >> buff;
 		  struct timeval frame_tp;
@@ -328,7 +255,8 @@ void threadMainLoop(Mat buff){
 #ifdef OUTPUT	
 		  std::clock_t c_start = std::clock(); 		  
 #endif
-
+		
+		  //Calculate direction from frame
         new_dir = calcDirection(buff);
 
 #ifdef OUTPUT
@@ -336,11 +264,15 @@ void threadMainLoop(Mat buff){
 		  std::cout << "Thread calculated frame for " << 1000.0*(c_stop-c_start) /CLOCKS_PER_SEC << " ms\n";
 #endif
 
+		  //Lock current_Direction
         cur_dir_mutex.lock();
+		  //Check Direction was updated with newer frame
 		  if(tp_last_frame.tv_sec < frame_tp.tv_sec ||
 				(tp_last_frame.tv_sec==frame_tp.tv_sec && tp_last_frame.tv_usec<frame_tp.tv_usec)){
+				//Uptade Direction and time
         		current_Direction = alpha * new_dir + (1-alpha) * current_Direction;
 				tp_last_frame = frame_tp;
+				//Notify main thread
 				cond_var.notify_all();
 		  }else{
 #ifdef OUTPUT

@@ -16,7 +16,6 @@
 #include <sys/time.h>
 #include <condition_variable>
 
-void calcDirectionWindowed();
 float calcDirection(cv::Mat buff);
 int init_uart();
 int uart_write(int handle, unsigned char data);
