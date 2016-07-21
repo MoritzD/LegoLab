@@ -27,8 +27,7 @@
             colorlinks=true,
             linkcolor=blue,
             citecolor=blue,
-            pdftitle=My Document
-            pdfauthor=My Good Self
+            pdftitle=Lego Car Documentation
            ]{hyperref} 
     \usepackage{thumbpdf}
 \else 
@@ -42,13 +41,13 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\lhead{}
-\rhead{}
+\lhead{\hspace{.5cm} Abdallah Attawia, Moritz Dötterl, Heiko Lengenfelder, Berkay Sümer}
+\rhead{Lego Car \hspace{.5cm}}
 \cfoot{\thepage}
 \onecolumn
 \title{\textbf{Lab Course: Hardware/Software Co-Design with a LEGO Car\\[3ex]}
-\normalsize{%Received 10/30/2015  22:20:00 Revised 10/30/2015  22:20:00 
-\textbf{Abdallah Attawia, Moritz Dötterl, Heiko, Berkay} \\
+\normalsize{\center{\textbf{\LARGE{SS 16}}}\\ 
+\textbf{Abdallah Attawia, Moritz Dötterl, Heiko Lengenfelder, Berkay Sümer} \\
 %Matriculation Number: 03664889} \\[3ex]
 Technische Universität München, Garching, Department of Informatics \\
 Boltzmannstr. 3, 85748 Garching, Germany  \\
@@ -63,6 +62,8 @@ This document explains the work done on a lego car to detect and follow a line a
 \begin{document}
 \date{}
 \maketitle
+\tableofcontents
+\newpage
 \noindent
 \section{Introduction}
 An autonomous car is one that can drive from point A to B independently without any human input. It can accelerate, brake and steer itself as well as sense the environment and navigate to avoid crashing. The development of autonomous vehicles is rapidly growing and a lot of big and small companies are working towards making autonomous driving a reality.\\
@@ -79,14 +80,13 @@ First, the micro SD-card for the Pi is prepared with the Raspbian Operating Syst
 \item {Add to the end of the file: \\"dtoverlay=pi3-disable-bt"}
 \end{itemize}
 \subsection{Actuators}
-\begin{itemize}
-	\item{Speed motors}
-	\item{Servo motor}
-\end{itemize}
+\subsubsection{Speed motors}
+The car has two Lego based driving motors that control the speed of the car. The motors are wired together to act as one motor, but with double the power. One motor drives the front tires, the other motor the rear tires to provide maximum traction.
+\subsubsection{Servo motor}
+The car uses one Lego servo motor to steer the direction. The servo steers both axles of the car to provide maximum agility and a relatively low turning cycle.
 \subsection{Sensors} 
-\begin{itemize}
-	\item{Ultrasound sensor} \\
-	The ultrasound sensor measures the distance from any detected object within its range. As shown in Figure \ref{ultrasound} the ultrasound sensors detects objects by sending out ultrasound waves and receiving an echo, if an object is detected. The sensor measures the time of flight between transmitting and receiving the signal and calculates the distance according to the following formula (\ref{dis}).
+\subsubsection{Ultrasound sensor}
+The ultrasound sensor measures the distance from any detected object within its range. As shown in Figure \ref{ultrasound} the ultrasound sensors detects objects by sending out ultrasound waves and receiving an echo, if an object is detected. The sensor measures the time of flight between transmitting and receiving the signal and calculates the distance according to the following formula (\ref{dis}).
 	
 \begin{equation}
 \centering
@@ -103,14 +103,96 @@ L = \frac{340(m/s)x\bigtriangleup t(s)}{2}
 
 In this course, the KS103 ultrasound sensor is used. It has a range up to 11m which can be specified by sending a command from the Nano-board. This sensor can operate using two digital communication protocols; I2C and Uart. It has an accuracy between $1mm$ and $10mm$\\
 In order for the ultrasound sensor to operate, it is first initialized and set to the desired range. Like the raspberry pi, it communicates with the Nano-board using uart communication, which has to be initialized as well. The Nano-board then sends a command to the sensor to send the data using uat. The Nano-board finally receives date from the sensor. The data read from the sensor is multiplied times 170 to get the distance from detected objects in micrometer.  
-	\item{USB Camera}
+\subsubsection{USB Camera}
+A standard USB web cam is used to provide a stream of images of the area in front of the car. How these images are processed is explained in chapter \ref{ImProLinFol}.
+
+\section{Hardware}
+we used several different devices to build up our Lego Car. This chapter explains what devices we have used, and how they are interconnected.
+\subsection{Components}
+The Hardware can be divided into four sub groups listed below:\\
+\newpage
+\textbf{Power Supply}
+\begin{itemize}
+	\item Battery
+	\item H-Bridge
+	\item CPT 15W DC/DC Converter
 \end{itemize}
+\textbf{Sensors}
+\begin{itemize}
+	\item KS103 Ultrasound Sensor
+	\item Camera
+\end{itemize}
+\textbf{Control}
+\begin{itemize}
+	\item DE0-Nano Board
+	\item Raspberry Pi 3 
+\end{itemize}
+\textbf{Actuators}
+\begin{itemize}
+	\item Steering Servo Motor
+	\item Drive Motors
+\end{itemize}
+\begin{figure*}[h]
+\centering
+\includegraphics[width=\textwidth]{wiringDiagram.png}
+\caption{wiring diagram of the car}
+\label{wiringDiagram}
+\end{figure*}
+Figure \ref{wiringDiagram} shows the wiring diagram of the total car setup. Including the Ultrasound sensor, the Nano Board, the steering servo, the driving motor in the first row (from left to right) and the USB Camera, the Raspberry Pi, the DC/DC converter and the battery in the second row (also from left to right). The H-Bridge is shown between those two rows and the wiring is depicted as colored lines interconnecting all devices.
 
-\section{Cabling}
 
-\section{Communication}
+\subsection{Power Supply}
+
+As a power source, we are using a three cell LIPO battery called “eco-x 5000 Top Fuel” which provides 11.1V. An H-Bridge with integrated voltage divider is used to convert from battery voltage to 5V to power the Nano Board which works at 5V. Furthermore the H-Bridge is used to translate the 5V signals from the Nano Board to 11.1V signals for the Drive Motor. We are also using a DC/DC converter which is an electronic circuit that also converts from the battery voltage to 5V. It is used to power the Raspberry Pi, since the voltage divider of the H-Bridge is not powerful enough for the Raspberry Pi. To ensure all devices work together they are all connected to the common Ground of the battery.
+
+
+\subsubsection{Power Connection}
+
+The 11.1V red cable of the battery is connected with the VCC input of the H-Bridge, and with the red cable of the DC/DC converter. The black GND cable of the battery is connected with the GND input of the H-Bridge, and the black ground input of the DC/DC converter.\\
+The 5V input of the Nano Board is connected to the 5V Output of the H-Bridge, alternatively it could also be wired to the 5V output of the DC/DC converter. The GND of the Nano board is connected to the Ground of the whole car, e.g at the GND input of the H-Bridge\\
+The servo motor's 11.1V input is attached to the VCC input of the H-Bridge. GND input of the servo motor has to be connected with the common Ground, so the GND input of the H-Bridge.
+
+
+\subsection{Sensors}
+
+A simple web cam and one “KS103" ultrasound sensor are used as sensors. In principle we got three ultrasound sensors, but we only needed one to get the distance to objects in front of the car. so this document will only focus on the single sensor.Based on this sensor the car will adopt it's speed. How this is done exactly is discussed in \ref{Usensor}. The camera is used for the line detection which is discussed in chapter \ref{ImProLinFol}.\newpage
+The KS103 Ultrasound Module has 5 pins (listed from right to left):
+\begin{itemize}
+\item VCC: power pin
+\item SDA/TX: data pin ($I^2C$) / Transmitter pin UART
+\item SCL/RX: clock pin ($I^2C$) / Receiver pin UART
+\item GND: power ground pin
+\item Mode: selects the communication mode (UART or $I^2C$)
+\end{itemize}
+There are two options for the communication: UART (universal asynchronous receiver/transmitter) and $I^2C$. Depending on the status of the Mode pin the sensor either expects $I^2C$ (Mode pin high), or UART (Mode pin low) communication. We are using the UART modus in this project, which is an asynchronous serial communication format.
+
+\subsubsection{Sensor Connection}
+The 5V VCC and GND pins of the sensor are connected with the 5V and GND pins on the GPIO header of the Nano Board to power the sensor.\\
+The Mode pin has to be connected with a GND pin of the Nano Board to select the UART mode.\\
+The TX and RX pins of the sensor are connected to the UART pins of the Nano Board. Note that, as usual with UART, the TX pin of the sensor is connected to the RX pin of the Nano Board and vice versa. GPIO\_00 is connected with the TX pin of the sensor and GPIO\_01 with the RX pin of the sensor.\\
+The camera is simply plugged into one of the USB-ports of the Raspberry Pi.
+
+\subsection{Control}
+
+We are using the “DE0-Nano Board” to provide an interface for the “Raspberry Pi 3” to control the car. The DE0-Nano Board introduces a compact-sized FPGA development platform suited for portable design projects, such as robots and mobile projects. A UART connection is used to enable communication between these two Boards. The calculation for the steering is done on the Raspberry Pi while the Nano Board generates the signals for the actuators and handles the connection to the ultrasonic sensor.
+
+\subsubsection{Control Connection}
+The UART pins of the Pi are connected with the UART pins of the Nano Board. The 8th pin of the Pi is the TX and 10th pin is the RX pin. They are connected to GPIO\_016 and GPIO\_017 of the Nano Board respectively.\\
+The 2nd and 4th pins of the Pi are two 5V pins which can be used to power the Pi itself, or power other small devices from the Pi. Either one of them is connected with the the 5V output of the DC/DC converter. The 6th pin is the GND pin which has to be connected with the GND of the care e.g. the GND output of the DC/DC converter.
+
+\subsection{Motors}
+
+We have two driving motors connected in a parallel manner and one servo motor on our car. The servo is used for the steering and the two driving motors are used to move the car. We are using PWM(Puls-width modulation) to generate analog control signals for the Motors. By using this modulation we had the ability to arrange the speed of our car and also the steering angle. The speed is adjusted by setting one pin of the driving motor to ground and generating a PWM signal on the other pin. The duty cycle of the PWM determines the speed of the car while switching the PWM and the ground pin causes the car to drive in the other direction. So setting one pin to '0' and the other pin to '1' would result in maximum speed while setting the pins to '1' and '0' would result in maximum reverse speed. The steering servo basically works the same way except that not the number of revolutions per time is controlled, but the angle of the servo. So setting the control pins to '0' and '1' respectively will cause the servo to steer all the way to one side, while setting the pins to '1' and '0' will make the servo steer all the way to the other side. 
+
+\subsubsection{Motors Connection}
+The driving motors are both connected together, so they work as if we had one motor. The two pins of the motor are connected to the high voltage output of the H-Bridge. We are using OUT3 and OUT4 of the H-Bridge. The PWM output of the Nano Board is connected to the according low voltage input of the H-Bridge. We are using GPIO\_112 and GPIO\_113 on the Nano Board and connected them with IN3 and IN4 of the H-Bridge. Now the H-Bridge will transfer our signals to the 11.1V logic level the driving motor needs. Furthermore the high currencies needed by the motor will not flow through the Nano Board, which would be destroyed by them.\\
+The two remaining cables of the servo motor are directly connected to the PWM output pins GPIO\_114 and GPIO\_115 of the Nano Board. Here no conversion between different logic levels is necessary and no high currencies could harm the Nano Board.
+
+
+%\section{Communication}
 
 \section{Collision Avoidance}
+\label{Usensor}
 In order to avoid collisions, an algorithm based on the idea of the adaptive cruise control is implemented. Adaptive cruise control is a cruise control function that allows the vehicle to adapt its speed according to the traffic and to maintain a safe distance from the vehicles ahead.\\
 In real cars, a long range radar sensor is used to detect the cars, here we use an ultrasound sensor to measure the distance from the vehicles ahead. The following algorithm is implemented to avoid the collision with other cars or objects and to adapt the speed to the surrounding traffic.
 \begin{itemize}
@@ -119,14 +201,14 @@ In real cars, a long range radar sensor is used to detect the cars, here we use 
 	\item if distance from ultrasound sensor $\geq$ a maximum set distance ($distance_{max}$)\\
 	 -drive with maximum speed
 	\item else (distance lies within $distance_{min}$ and $distance_{max}$)\\
-	 -adapt speed according to distance:
-	 \begin{equation}
-	 Current Speed = Maximum Speed * \frac{distance}{distance_{max}}
-	 \end{equation}
+	 -adapt speed according to distance:\\
+%	 \begin{equation}
+	 $Current Speed = MaxSpeed * \frac{distance}{distance_{max}}$
+%	 \end{equation}
 \end{itemize}
-
 The speed of the car is set according to the aforementioned algorithm, where the current speed is the duty cycle that is assigned to the speed motors.
 \section{Image processing for line detection and following}
+\label{ImProLinFol}
 The task of the whole project was to build a Lego Car that can autonomous follow a line on the ground. For this purpose we are using an ordinary web cam on the front of the car giving us an image of the ground up to approximately 20 cm in front of the car. We developed an algorithm that detects the line in the image and calculates how the car needs to steer in order to stay on that line. The calculation is entirely done on the Raspberry Pi using the image processing framework OpenCV. The following sections explain how the image processing works and how we optimized it for the Raspberry Pi.
 
 \input{heikodoc.tex}
@@ -191,20 +273,12 @@ With this technique the worker threads alternately grab the images provided from
 \section{Conclusion}
 To conclude, the car followed a closed track without getting out of line in both directions. The maximum set speed was about 85\% of the maximum possible speed. With a few modifications on the camera, e.g. a higher frame rate of 30 FPS, or a wider viewing angle, or a higher computation power on the Raspberry Pi, the full motor speed could had been reached.
 
-\section*{Acknowledgments}
+%\section*{Acknowledgments}
 
 
-\begin{small}
-\bibliography{mybib}
-\bibliographystyle{ieeetr}
-\end{small}
-
-
-
+%\begin{small}
+%\bibliography{mybib}
+%\bibliographystyle{ieeetr}
+%\end{small}
 
 \end{document}
-
-% I removed the typos and 
-% I described the general hardware implementations in the opening statement of the review and stated the most significant differences. Also, I removed the unnecessary hardware descriptions in the following subsections.
-% I started each subsection with a brief explanation of the control methods then described them briefly using an example in one of the systems.
-% I tried to make the control methods as understandable as possible and to explain the unclear terminologies.
