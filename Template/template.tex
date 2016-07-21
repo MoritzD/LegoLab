@@ -68,7 +68,7 @@ This document explains the work done on a lego car to detect and follow a line a
 \section{Introduction}
 An autonomous car is one that can drive from point A to B independently without any human input. It can accelerate, brake and steer itself as well as sense the environment and navigate to avoid crashing. The development of autonomous vehicles is rapidly growing and a lot of big and small companies are working towards making autonomous driving a reality.\\
 In this project a small scaled model, a lego car, along with some cheap components are used to test a real autonomous driving function, i.e. following a line on the street. This documentation starts with a brief explanation of the different hardware components. Then the cabling and communication between the components is described. Lastly, the collision avoidance technique and and the line detection and following are explained. The code, attached to this report, carries out the functions explained here and is clearly documented.
-\section{Hardware Parts} 
+\section{Components overview} 
 The hardware components used are two controllers, the DEO-Nano and the Raspberry Pi, two types of actuators, namely speed motors and servo motors, as well as two types of sensors, which are the ultrasound sensors and the USB-camera.
 \subsection{DEO-Nano} 
 The DE0-Nano board is a compact-sized FPGA based development platform manufactured by terasIC. Its heart is a Cyclone IV FPGA from Altera. Furthermore it features on board memory, LEDs, Buttons, and most importantly three GPIO headers. On this FPGA we flashed the provided Nios-II image. This is an image of an adaptable processor allowing for custom specializations such as multiple hardware UART handlers. Now it is possible to wright code for this processor in C using the hardware you desire, without any trade off. We are using four UART units to connect to three ultrasonic sensors as well as to the Raspberry Pi. Furthermore we use two PWM modules with each two channels allowing us to generate PWM signals at four pins. Those are used to control the drive motor and the steering servo.
@@ -202,9 +202,9 @@ In real cars, a long range radar sensor is used to detect the cars, here we use 
 	 -drive with maximum speed
 	\item else (distance lies within $distance_{min}$ and $distance_{max}$)\\
 	 -adapt speed according to distance:\\
-%	 \begin{equation}
-	 $Current Speed = MaxSpeed * \frac{distance}{distance_{max}}$
-%	 \end{equation}
+	 \begin{equation}
+	 CurSpeed = MaxSpeed * \frac{distance}{distance_{max}}
+	 \end{equation}
 \end{itemize}
 The speed of the car is set according to the aforementioned algorithm, where the current speed is the duty cycle that is assigned to the speed motors.
 \section{Image processing for line detection and following}
