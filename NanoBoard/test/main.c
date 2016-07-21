@@ -10,8 +10,8 @@
 int main()
 {
 	printf("Running!\n");
+	drive_by_rasp_input();
 
-    drive_by_rasp_input();
 
 
 	return 0;
@@ -61,42 +61,6 @@ void drive_by_sensors(){
 		}else{
 			m_duty1 = 0x0;
 		}
-        
-        //Adaptive Cruise Control 1
-        /*if (distance0>500000) {
-            m_duty1 = 6250;
-        }else if{distance0<=500000 && distance0>50000)
-            m_duty1 = 6250 - (6250*(500000-distance0))
-        }
-        else{
-            m_duty1 = 0;
-        }*/
-        
-        //Adaptive Cruise Control 2
-        /*if (distance0>500000) {
-            m_duty1 = 6250;
-        }else if(distance0<=500000 && distance0>350000){
-            m_duty1 = 4687.5;
-        }else if(distance0<=350000 && distance0>200000){
-            m_duty1 = 3125;
-        }else if(distance0<=200000 && distance0>50000){
-            m_duty1 = 1562.5;
-        }else{
-            m_duty1 = 0;
-        }*/
-        
-        
-        //Adaptive Cruise Cont      rol 3
-        /*if (distance0>500000) {
-         m_duty1 = 6250;
-         }else if{distance0<=500000 && distance0>50000)
-            while(distance0!=500000){                      //to maintain a constant distance
-            m_duty1 = 6250 - (6250*(500000-distance0))
-            distance0 = ultrasound_read(NEW_ULTRASOUND0_BASE) * 170;
-            }
-         }else{
-         m_duty1 = 0;
-         }*/
 
 
 		if(distance1>893){ //893 is about 0,15181m
@@ -147,57 +111,32 @@ void drive_by_rasp_input(){
 
 		distance = ultrasound_read(NEW_ULTRASOUND0_BASE) * 170;
 
+		/*
 		//Check for collision
-		/*if(distance > 300){
-			m_duty1=0x186A;
+		if(distance > 100000){
+			m_duty1=5200;
 		}else{
 			m_duty1=0;
-		}*/
+		}
+		*/
         
         //Adaptive Cruise Control 1
-        /*if (distance>600000) {
-            m_duty1 = 5500;
-        }else if{distance<=600000 && distance>130000)
-            m_duty1 = 5500 - (5500*(600000-distance))
-        }else{
-            m_duty1 = 0;
-        }*/
-        
-        //Adaptive Cruise Control 2
-        /*if (distance>500000) {
-            m_duty1 = 5500;
-        }else if(distance<=500000 && distance>350000){
-            m_duty1 = 4000;
-        }else if(distance<=350000 && distance>200000){
-            m_duty1 = 2500;
-        }else if(distance<=200000 && distance>130000){
-            m_duty1 = 1000;
-        }else{
-         m_duty1 = 0;
-        }*/
-        
-        //Adaptive Cruise Control 3
-        /*if (distance<=130000) {
-         m_duty1 = 0x0;
-         }else if{distance<=600000 && distance>130000)
-         m_duty1 = 5500 - (5500*(600000-distance))
-         }else{
-         m_duty1 = 0x157C;
-         }*/
-        
-        //Adaptive Cruise Control 4
-        if(distance<130000){
-            m_duty1 = 0;
-        }else{
-            m_duty1 = 6500 - distance*7 + 1000;
-        }
-        
-        //Set motor PWM signal
-        motor_setting(m_phase1,m_duty1,m_phase2,m_duty2,m_period,m_enable);
+		if (distance>500000) {
+			m_duty1 = 5200;
+		}else if(distance<=500000 && distance>100000){
+				m_duty1 = 5200 *((float)distance/500000.0);
+		}else{
+				m_duty1 = 0;
+		}
+
+        printf("Duty_1 is: %i\n", (int) m_duty1);
+        printf("Ultrasound value is: %imm\n", distance/1000);
 
 		//Set steering PWM signal
 		steering_set_level(raspberry_read(UART_0_BASE));
 
+		//Set motor PWM signal
+		motor_setting(m_phase1,m_duty1,m_phase2,m_duty2,m_period,m_enable);
 
 		for(i = 0; i<2550; i++){
 			for(j = 0; j<10; j++);
